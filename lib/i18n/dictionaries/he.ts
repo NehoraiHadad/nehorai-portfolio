@@ -130,32 +130,33 @@ export const heDictionary: AppDictionary = {
     },
   },
   assistant: {
-    title: 'NEHORAI // ASSISTANT',
+    title: 'NEO // PORTFOLIO',
     matrixTitle: 'MATRIX // UPLINK',
     quickPrompts: ['מה הסטאק הטכנולוגי שלך?', 'הצג לי את הפרויקטים שלך', 'איך אפשר לעבוד יחד?'],
     initialMessages: [
-      { type: 'system', content: 'המערכת אותחלה. PortfolioAgent פעיל.' },
+      { type: 'system', content: 'המערכת אותחלה. NEO מחובר.' },
       {
         type: 'agent',
-        agentName: 'PortfolioAgent',
-        content: 'היי. אני עוזר קטן שיכול לענות על שאלות לגבי ה-stack של Nehorai, הפרויקטים שלו ואיך אפשר ליצור איתו קשר.',
+        agentName: 'NEO',
+        content: 'היי, אני NEO — יכול לענות על שאלות לגבי ה-stack של Nehorai, הפרויקטים שלו ואיך אפשר ליצור איתו קשר. תעקבו אחרי הארנב הלבן.',
       },
     ],
-    clearedMessage: 'זיכרון המערכת נוקה. PortfolioAgent אותחל מחדש.',
+    clearedMessage: 'זיכרון המערכת נוקה. NEO אותחל מחדש.',
     helpMessage:
       'אפשר לשאול אותי כל דבר על ה-stack של Nehorai, הפרויקטים שלו או איך ליצור איתו קשר. פקודות: /clear, /download_cv, /matrix',
     downloadMessage: '> System: מתחיל העברת קובץ מאובטחת... [Nehorai Hadad CV - SW.pdf]',
     matrixMessage: 'תתעורר, Neo... ה-Matrix מחזיקה בך.',
-    analyzingMessage: 'PortfolioAgent: חושב...',
+    analyzingMessage: 'NEO: חושב...',
     errorMessage:
       'לא הצלחתי להתחבר לשירות העוזר כרגע. נסו שוב עוד רגע — או כתבו ישירות ל-nehorai.hadad@gmail.com.',
     rateLimitMessage: 'יותר מדי הודעות בבת אחת — חכו כמה שניות ונסו שוב.',
+    fallbackNotice: '> NEO: הליבה הראשית בתפוסה — עובר למודל גיבוי.',
     srThinking: 'העוזר מקליד תשובה…',
     stopLabel: 'עצירת התשובה',
-    inputPlaceholder: 'שאלו את PortfolioAgent...',
+    inputPlaceholder: 'שאלו את NEO...',
     matrixInputPlaceholder: 'הכנס פקודה...',
     agentNames: {
-      portfolio: 'PortfolioAgent',
+      portfolio: 'NEO',
     },
     intentKeywords: {
       commands: {

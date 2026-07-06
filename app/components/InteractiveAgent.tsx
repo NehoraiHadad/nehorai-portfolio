@@ -94,6 +94,78 @@ const LinkifiedText = ({ text }: { text: string }) => (
   </>
 );
 
+// Markdown-lite for streamed agent answers: the LLM emits **bold** and "- "/"* "
+// bullet lines. This is a small, pure-React, streaming-safe renderer — no
+// dangerouslySetInnerHTML, no dependency. "Streaming-safe" means: it re-runs on
+// every chunk while the answer is still arriving, so an unclosed `**` (the
+// closing pair hasn't streamed in yet) must render as literal text, never throw,
+// and never drop content. Bare URLs inside text segments reuse LinkifiedText.
+const BOLD_SPLIT_RE = /(\*\*[^*]+\*\*)/g;
+// Renders a single line's text, splitting out **bold** runs and linkifying the rest.
+const InlineMarkdown = ({ text }: { text: string }) => (
+  <>
+    {text.split(BOLD_SPLIT_RE).map((part, i) => {
+      const isBold = part.length > 4 && part.startsWith('**') && part.endsWith('**');
+      if (!isBold) return <LinkifiedText key={i} text={part} />;
+      return <strong key={i}>{<LinkifiedText text={part.slice(2, -2)} />}</strong>;
+    })}
+  </>
+);
+
+// Splits a message into plain-text runs (pre-wrap, newlines preserved) and
+// contiguous "- "/"* " bullet blocks (rendered as a <ul>). Anything the parser
+// doesn't recognize — including an unclosed "**" — passes through verbatim as
+// part of a plain-text run, so a message never crashes and never loses content
+// mid-stream.
+const MarkdownLite = ({ text }: { text: string }) => {
+  const lines = text.split('\n');
+  const blocks: Array<{ kind: 'text' | 'list'; lines: string[] }> = [];
+  for (const line of lines) {
+    const isBullet = /^\s*[-*]\s+/.test(line);
+    const kind = isBullet ? 'list' : 'text';
+    const last = blocks[blocks.length - 1];
+    if (last && last.kind === kind) {
+      last.lines.push(line);
+    } else {
+      blocks.push({ kind, lines: [line] });
+    }
+  }
+  return (
+    <>
+      {blocks.map((block, i) => {
+        if (block.kind === 'list') {
+          return (
+            <ul key={i} className="ps-4 my-1 space-y-0.5">
+              {block.lines.map((line, j) => {
+                const item = line.replace(/^\s*[-*]\s+/, '');
+                return (
+                  <li key={j} className="text-sm leading-relaxed flex gap-1.5">
+                    <span aria-hidden="true" className="text-accent">▸</span>
+                    <span className="bidi-plaintext break-words" dir="auto">
+                      <InlineMarkdown text={item} />
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          );
+        }
+        // Plain-text block: keep newlines with whitespace-pre-wrap, matching
+        // the previous rendering for non-list content.
+        return (
+          <p
+            key={i}
+            className="text-sm leading-relaxed bidi-plaintext whitespace-pre-wrap break-words"
+            dir="auto"
+          >
+            <InlineMarkdown text={block.lines.join('\n')} />
+          </p>
+        );
+      })}
+    </>
+  );
+};
+
 export const InteractiveAgent = ({
   onClose,
   inputRef: inputRefProp,
@@ -127,6 +199,8 @@ export const InteractiveAgent = ({
   const localInputRef = useRef<HTMLInputElement>(null);
   const inputRef = inputRefProp ?? localInputRef;
   const abortRef = useRef<AbortController | null>(null);
+  // Fallback-model notice shows at most once per conversation — reset on /clear.
+  const fallbackNoticeShownRef = useRef(false);
 
   // Abort an in-flight answer stream when the chat unmounts (mobile modal close).
   useEffect(() => () => abortRef.current?.abort(), []);
@@ -179,6 +253,7 @@ export const InteractiveAgent = ({
       setIsTyping(true);
       setTimeout(() => {
         setMatrixMode(false);
+        fallbackNoticeShownRef.current = false;
         setMessages([
           { id: nextMessageId(), type: 'system', content: assistant.clearedMessage }
         ]);
@@ -277,6 +352,17 @@ export const InteractiveAgent = ({
           /* non-JSON error body — keep the generic code */
         }
         throw Object.assign(new Error(`portfolio-chat responded ${res.status}`), { code });
+      }
+
+      // Surface a one-time notice when the primary model's daily quota is
+      // exhausted and the API served the answer from the fallback model.
+      const servingModel = res.headers.get('X-Portfolio-Chat-Model');
+      if (servingModel && servingModel !== 'gemini-2.5-flash' && !fallbackNoticeShownRef.current) {
+        fallbackNoticeShownRef.current = true;
+        setMessages(prev => [
+          ...prev,
+          { id: `${nextMessageId()}-fallback`, type: 'system', content: assistant.fallbackNotice },
+        ]);
       }
 
       const reader = res.body.getReader();
@@ -429,11 +515,15 @@ export const InteractiveAgent = ({
                   )}
                   {/* 3.8: jittered typing on seeded agent messages; live (streamed) answers
                       render directly — the network stream is the typing effect, and
-                      JitteredTyping restarts whenever its text prop changes. */}
+                      JitteredTyping restarts whenever its text prop changes. Seeded
+                      messages contain no markdown, so they stay plain text; live/error
+                      agent bubbles run through MarkdownLite for **bold** and "- " lists. */}
                   {msg.type === 'agent' && !msg.live ? (
                     <p className="text-sm leading-relaxed bidi-plaintext whitespace-pre-wrap break-words" dir="auto">
                       <JitteredTyping text={msg.content} reduced={prefersReduced} />
                     </p>
+                  ) : msg.type === 'agent' ? (
+                    <MarkdownLite text={msg.content} />
                   ) : (
                     <p className="text-sm leading-relaxed bidi-plaintext whitespace-pre-wrap break-words" dir="auto">
                       <LinkifiedText text={msg.content} />

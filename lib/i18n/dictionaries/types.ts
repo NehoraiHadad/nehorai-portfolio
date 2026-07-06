@@ -176,6 +176,9 @@ export interface AppDictionary {
     errorMessage: string;
     /** Agent-bubble message when the per-IP rate limit trips (HTTP 429). */
     rateLimitMessage: string;
+    /** System-line notice shown once per conversation when the API served the
+     * answer from the fallback model (primary's daily quota exhausted). */
+    fallbackNotice: string;
     /** Screen-reader-only announcement while an answer is being generated. */
     srThinking: string;
     /** aria-label for the stop-generation button shown while an answer streams. */

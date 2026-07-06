@@ -130,33 +130,34 @@ export const enDictionary: AppDictionary = {
     },
   },
   assistant: {
-    title: 'NEHORAI // ASSISTANT',
+    title: 'NEO // PORTFOLIO',
     matrixTitle: 'MATRIX // UPLINK',
     quickPrompts: ["What's your tech stack?", 'Show me your projects', 'How can we work together?'],
     initialMessages: [
-      { type: 'system', content: 'System initialized. PortfolioAgent online.' },
+      { type: 'system', content: 'System initialized. NEO online.' },
       {
         type: 'agent',
-        agentName: 'PortfolioAgent',
-        content: "Hi. I'm a small assistant that can answer questions about Nehorai's stack, projects, and how to reach him.",
+        agentName: 'NEO',
+        content: "Hi. I'm NEO — I can answer questions about Nehorai's stack, projects, and how to reach him. Follow the white rabbit.",
       },
     ],
-    clearedMessage: 'System memory cleared. PortfolioAgent re-initialized.',
+    clearedMessage: 'System memory cleared. NEO re-initialized.',
     helpMessage:
       "Ask me anything about Nehorai's stack, projects, or how to reach him. Commands: /clear, /download_cv, /matrix",
     downloadMessage: '> System: Initiating secure file transfer... [Nehorai Hadad CV - SW.pdf]',
     matrixMessage: 'Wake up, Neo... The Matrix has you.',
-    analyzingMessage: 'PortfolioAgent: thinking...',
+    analyzingMessage: 'NEO: thinking...',
     errorMessage:
       "I couldn't reach the assistant service just now. Please try again in a moment — or email nehorai.hadad@gmail.com directly.",
     rateLimitMessage:
       'Too many messages at once — give it a few seconds and try again.',
+    fallbackNotice: '> NEO: primary core at capacity — running on backup model.',
     srThinking: 'Assistant is responding…',
     stopLabel: 'Stop response',
-    inputPlaceholder: 'Ask PortfolioAgent...',
+    inputPlaceholder: 'Ask NEO...',
     matrixInputPlaceholder: 'Enter command...',
     agentNames: {
-      portfolio: 'PortfolioAgent',
+      portfolio: 'NEO',
     },
     intentKeywords: {
       commands: {
