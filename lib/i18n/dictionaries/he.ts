@@ -134,28 +134,28 @@ export const heDictionary: AppDictionary = {
     matrixTitle: 'MATRIX // UPLINK',
     quickPrompts: ['מה הסטאק הטכנולוגי שלך?', 'הצג לי את הפרויקטים שלך', 'איך אפשר לעבוד יחד?'],
     initialMessages: [
-      { type: 'system', content: 'המערכת אותחלה. ה-Orchestrator פעיל.' },
+      { type: 'system', content: 'המערכת אותחלה. PortfolioAgent פעיל.' },
       {
         type: 'agent',
         agentName: 'PortfolioAgent',
         content: 'היי. אני עוזר קטן שיכול לענות על שאלות לגבי ה-stack של Nehorai, הפרויקטים שלו ואיך אפשר ליצור איתו קשר.',
       },
     ],
-    clearedMessage: 'זיכרון המערכת נוקה. ה-Orchestrator אותחל מחדש.',
-    helpMessage: 'פקודות זמינות: /clear, /help, /download_cv, /matrix',
-    downloadMessage: '> Orchestrator: מתחיל העברת קובץ מאובטחת... [Nehorai Hadad CV - SW.pdf]',
+    clearedMessage: 'זיכרון המערכת נוקה. PortfolioAgent אותחל מחדש.',
+    helpMessage:
+      'אפשר לשאול אותי כל דבר על ה-stack של Nehorai, הפרויקטים שלו או איך ליצור איתו קשר. פקודות: /clear, /download_cv, /matrix',
+    downloadMessage: '> System: מתחיל העברת קובץ מאובטחת... [Nehorai Hadad CV - SW.pdf]',
     matrixMessage: 'תתעורר, Neo... ה-Matrix מחזיקה בך.',
-    analyzingMessage: '> Orchestrator: מנתח כוונה...',
-    routingMessage: '> Orchestrator: מנתב אל {agentName}...',
+    analyzingMessage: 'PortfolioAgent: חושב...',
     errorMessage:
       'לא הצלחתי להתחבר לשירות העוזר כרגע. נסו שוב עוד רגע — או כתבו ישירות ל-nehorai.hadad@gmail.com.',
-    inputPlaceholder: 'שאל את ה-Orchestrator...',
+    rateLimitMessage: 'יותר מדי הודעות בבת אחת — חכו כמה שניות ונסו שוב.',
+    srThinking: 'העוזר מקליד תשובה…',
+    stopLabel: 'עצירת התשובה',
+    inputPlaceholder: 'שאלו את PortfolioAgent...',
     matrixInputPlaceholder: 'הכנס פקודה...',
     agentNames: {
       portfolio: 'PortfolioAgent',
-      showcase: 'ShowcaseAgent',
-      tech: 'TechAgent',
-      contact: 'CommAgent',
     },
     intentKeywords: {
       commands: {
@@ -164,21 +164,6 @@ export const heDictionary: AppDictionary = {
         download: ['download', '/download_cv', 'cv', 'resume', 'קורות', 'חיים'],
         matrix: ['matrix', '/matrix', 'מטריקס'],
       },
-      routing: {
-        showcase: ['פרויקט', 'פרויקטים', 'עבודות', 'תיק עבודות', 'מה בנית', 'הצג'],
-        tech: ['סטאק', 'טכנולוג', 'טכנולוגי', 'skill', 'skills', 'tech'],
-        contact: ['קשר', 'צור קשר', 'אימייל', 'מייל', 'לעבוד', 'יחד', 'העסקה'],
-      },
-    },
-    responses: {
-      default:
-        'אני יכול לענות על שאלות לגבי ה-stack של Nehorai, הפרויקטים שלו ואיך ליצור איתו קשר. נסה לשאול על הטכנולוגיות שלו, הפרויקטים שלו או על עבודה משותפת.',
-      showcase:
-        'מוצגים חמישה פרויקטים: Podcasto, Agendo, Story Creator, ושני אתרי לקוח חיים — ykl.org.il ו-judah-brigade.vercel.app. גלול לאזור הפרויקטים הנבחרים כדי לראות את הפרטים.',
-      tech:
-        'ה-stack היומיומי: Next.js 15/16 + TypeScript בפרונט, Node ו-Python בבק, PostgreSQL/pgvector לנתונים, AWS Lambda/SQS/DynamoDB לפייפליינים, ו-LangGraph / AWS AgentCore / MCP ל-agents. מתחת לכל זה יש שמונה שנות ניסיון עם Linux on-prem.',
-      contact:
-        'Email: nehorai.hadad@gmail.com. מחפש תפקידי Full-Stack או AI Engineer בישראל — Hybrid או Remote, שניהם מתאימים.',
     },
   },
   footer: {

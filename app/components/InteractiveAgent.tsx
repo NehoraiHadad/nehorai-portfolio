@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useId } from 'react';
 import { m, AnimatePresence } from 'motion/react';
-import { Send, Terminal, Cpu, Bot, X } from 'lucide-react';
+import { Send, Terminal, Cpu, Bot, X, Square } from 'lucide-react';
 import { useDictionary, useDirection, useLocale } from '@/lib/i18n/provider';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { TerminalFrame } from '@/app/components/TerminalFrame';
@@ -67,7 +67,37 @@ const JitteredTyping = ({
   );
 };
 
-export const InteractiveAgent = ({ onClose }: { onClose?: () => void } = {}) => {
+// Streamed answers arrive as plain text; bare URLs in them (project links,
+// GitHub repos) must be tappable — especially on mobile.
+const URL_SPLIT_RE = /(https?:\/\/[^\s]+)/g;
+const LinkifiedText = ({ text }: { text: string }) => (
+  <>
+    {text.split(URL_SPLIT_RE).map((part, i) => {
+      if (!/^https?:\/\//.test(part)) return <React.Fragment key={i}>{part}</React.Fragment>;
+      // Sentence punctuation glued to the URL stays as plain text.
+      const trailing = part.match(/[.,;:!?)\]]+$/)?.[0] ?? '';
+      const url = trailing ? part.slice(0, -trailing.length) : part;
+      return (
+        <React.Fragment key={i}>
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline text-accent hover:text-accent-hover break-all"
+          >
+            {url}
+          </a>
+          {trailing}
+        </React.Fragment>
+      );
+    })}
+  </>
+);
+
+export const InteractiveAgent = ({
+  onClose,
+  inputRef: inputRefProp,
+}: { onClose?: () => void; inputRef?: React.RefObject<HTMLInputElement | null> } = {}) => {
   const { assistant, a11y, dossier } = useDictionary();
   const direction = useDirection();
   const locale = useLocale();
@@ -81,24 +111,45 @@ export const InteractiveAgent = ({ onClose }: { onClose?: () => void } = {}) => 
     }))
   );
   const [inputValue, setInputValue] = useState('');
+  // isTyping covers the short scripted command delays; streamPhase tracks the
+  // real API call ('pending' until the first chunk lands, then 'streaming').
   const [isTyping, setIsTyping] = useState(false);
+  const [streamPhase, setStreamPhase] = useState<'pending' | 'streaming' | null>(null);
+  // Completed answer text, exposed once to the sr-only live region — streamed
+  // chunks mutate an existing DOM node, which role="log" never announces.
+  const [announcedAnswer, setAnnouncedAnswer] = useState('');
   const [matrixMode, setMatrixMode] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  // Stick to the bottom only while the user is already there — a reader who
+  // scrolled up mid-stream must not be yanked back down by the next chunk.
+  const stickToBottomRef = useRef(true);
+  const localInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = inputRefProp ?? localInputRef;
   const abortRef = useRef<AbortController | null>(null);
 
   // Abort an in-flight answer stream when the chat unmounts (mobile modal close).
   useEffect(() => () => abortRef.current?.abort(), []);
 
-  const scrollToBottom = () => {
+  const handleChatScroll = () => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    stickToBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+  };
+
+  const scrollToBottom = (smooth: boolean) => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      messagesEndRef.current.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'nearest' });
     }
   };
 
   useEffect(() => {
-    const timeoutId = setTimeout(scrollToBottom, 50);
+    if (!stickToBottomRef.current) return;
+    // Instant scroll while chunks stream — a smooth animation emits mid-flight
+    // scroll positions that would read as "user scrolled away".
+    const timeoutId = setTimeout(() => scrollToBottom(streamPhase !== 'streaming'), 50);
     return () => clearTimeout(timeoutId);
-  }, [messages, isTyping]);
+  }, [messages, isTyping, streamPhase]);
 
   const nextMessageId = () => {
     messageIdRef.current += 1;
@@ -119,11 +170,13 @@ export const InteractiveAgent = ({ onClose }: { onClose?: () => void } = {}) => 
     const userMsgId = nextMessageId();
     setMessages(prev => [...prev, { id: userMsgId, type: 'user', content: text }]);
     setInputValue('');
-    setIsTyping(true);
+    setAnnouncedAnswer('');
+    stickToBottomRef.current = true;
 
     const normalizedText = normalizeInput(text);
     
     if (matchesCommand(normalizedText, assistant.intentKeywords.commands.clear)) {
+      setIsTyping(true);
       setTimeout(() => {
         setMatrixMode(false);
         setMessages([
@@ -135,6 +188,7 @@ export const InteractiveAgent = ({ onClose }: { onClose?: () => void } = {}) => 
     }
 
     if (matchesCommand(normalizedText, assistant.intentKeywords.commands.help)) {
+      setIsTyping(true);
       setTimeout(() => {
         setMessages(prev => [...prev, { 
           id: nextMessageId(), 
@@ -147,6 +201,7 @@ export const InteractiveAgent = ({ onClose }: { onClose?: () => void } = {}) => 
     }
 
     if (matchesCommand(normalizedText, assistant.intentKeywords.commands.download)) {
+      setIsTyping(true);
       setTimeout(() => {
         setMessages(prev => [...prev, {
           id: nextMessageId(),
@@ -167,6 +222,7 @@ export const InteractiveAgent = ({ onClose }: { onClose?: () => void } = {}) => 
     }
 
     if (matchesCommand(normalizedText, assistant.intentKeywords.commands.matrix)) {
+      setIsTyping(true);
       setTimeout(() => {
         setMatrixMode(true);
         setMessages(prev => [...prev, { 
@@ -181,7 +237,9 @@ export const InteractiveAgent = ({ onClose }: { onClose?: () => void } = {}) => 
 
     // Real agent call — POST the conversation window to /api/portfolio-chat and
     // render the streamed answer as it arrives (the stream is the typing effect).
-    setMessages(prev => [...prev, { id: `${nextMessageId()}-sys1`, type: 'system', content: assistant.analyzingMessage }]);
+    // No transcript entries for status: a transient "thinking" line renders off
+    // streamPhase and disappears once the first chunk lands.
+    setStreamPhase('pending');
 
     const agentName = assistant.agentNames.portfolio;
     const history = [
@@ -209,7 +267,17 @@ export const InteractiveAgent = ({ onClose }: { onClose?: () => void } = {}) => 
         body: JSON.stringify({ messages: history, locale }),
         signal: controller.signal,
       });
-      if (!res.ok || !res.body) throw new Error(`portfolio-chat responded ${res.status}`);
+      if (!res.ok || !res.body) {
+        // The route returns { error: { code } } — surface rate limiting
+        // distinctly instead of the generic outage message.
+        let code = 'internal';
+        try {
+          code = (await res.json())?.error?.code ?? code;
+        } catch {
+          /* non-JSON error body — keep the generic code */
+        }
+        throw Object.assign(new Error(`portfolio-chat responded ${res.status}`), { code });
+      }
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -219,12 +287,11 @@ export const InteractiveAgent = ({ onClose }: { onClose?: () => void } = {}) => 
         received += decoder.decode(value, { stream: true });
         const snapshot = received;
         if (answerId === null) {
-          const routingId = `${nextMessageId()}-sys2`;
           answerId = `${nextMessageId()}-ans`;
           const createdId = answerId;
+          setStreamPhase('streaming');
           setMessages(prev => [
             ...prev,
-            { id: routingId, type: 'system', content: assistant.routingMessage.replace('{agentName}', agentName) },
             { id: createdId, type: 'agent', agentName, content: snapshot, live: true },
           ]);
         } else {
@@ -233,19 +300,34 @@ export const InteractiveAgent = ({ onClose }: { onClose?: () => void } = {}) => 
         }
       }
       if (!received.trim()) throw new Error('portfolio-chat returned an empty answer');
+      setAnnouncedAnswer(received);
     } catch (err) {
       if ((err as Error).name === 'AbortError') return;
       // Keep any partial answer; only show the fallback when nothing arrived.
       if (!received.trim()) {
+        const fallback =
+          (err as { code?: string }).code === 'rate_limited'
+            ? assistant.rateLimitMessage
+            : assistant.errorMessage;
         setMessages(prev => [
-          ...prev,
-          { id: `${nextMessageId()}-err`, type: 'agent', agentName, content: assistant.errorMessage, live: true },
+          // A whitespace-only stream leaves an empty live bubble — drop it.
+          ...prev.filter(msg => msg.id !== answerId),
+          { id: `${nextMessageId()}-err`, type: 'agent', agentName, content: fallback, live: true },
         ]);
+        // Put the question back so a retry is one keypress, not a retype —
+        // unless the user already started composing something else.
+        setInputValue(prev => prev || text);
       }
     } finally {
       if (abortRef.current === controller) abortRef.current = null;
-      if (!controller.signal.aborted) setIsTyping(false);
+      if (!controller.signal.aborted) setStreamPhase(null);
     }
+  };
+
+  const stopStreaming = () => {
+    abortRef.current?.abort();
+    abortRef.current = null;
+    setStreamPhase(null);
   };
 
   // Custom header for InteractiveAgent — token-driven via [data-matrix] on the panel root.
@@ -282,20 +364,24 @@ export const InteractiveAgent = ({ onClose }: { onClose?: () => void } = {}) => 
   return (
     <TerminalFrame
       headerSlot={agentHeader}
-      className="relative w-full max-w-lg mx-auto lg:mx-0 backdrop-blur-xl shadow-2xl flex flex-col h-[500px] max-h-[80vh] transition-[background-color,border-color,box-shadow] duration-1000 bg-page/80 border-line"
+      className="relative w-full max-w-lg mx-auto lg:mx-0 backdrop-blur-xl shadow-2xl flex flex-col h-[500px] max-h-[80dvh] transition-[background-color,border-color,box-shadow] duration-1000 bg-page/80 border-line"
       bodyClassName="flex flex-col flex-1 overflow-hidden"
       dir={direction}
       data-matrix={matrixMode || undefined}
     >
 
       {/* 4.4: role="log" so new chat messages are announced by screen readers */}
-      {/* 4.4: visually-hidden typing announcement */}
+      {/* 4.4: visually-hidden progress + completed-answer announcement. Streamed
+          chunks mutate an existing node, which aria-relevant="additions" never
+          announces — so the finished answer is exposed here once, whole. */}
       <p className="sr-only" aria-live="polite" aria-atomic="true">
-        {isTyping ? '…' : ''}
+        {isTyping || streamPhase ? assistant.srThinking : announcedAnswer}
       </p>
 
       {/* Chat Area */}
       <div
+        ref={scrollContainerRef}
+        onScroll={handleChatScroll}
         role="log"
         aria-live="polite"
         aria-relevant="additions"
@@ -345,11 +431,13 @@ export const InteractiveAgent = ({ onClose }: { onClose?: () => void } = {}) => 
                       render directly — the network stream is the typing effect, and
                       JitteredTyping restarts whenever its text prop changes. */}
                   {msg.type === 'agent' && !msg.live ? (
-                    <p className="text-sm leading-relaxed bidi-plaintext" dir="auto">
+                    <p className="text-sm leading-relaxed bidi-plaintext whitespace-pre-wrap break-words" dir="auto">
                       <JitteredTyping text={msg.content} reduced={prefersReduced} />
                     </p>
                   ) : (
-                    <p className="text-sm leading-relaxed bidi-plaintext" dir="auto">{msg.content}</p>
+                    <p className="text-sm leading-relaxed bidi-plaintext whitespace-pre-wrap break-words" dir="auto">
+                      <LinkifiedText text={msg.content} />
+                    </p>
                   )}
                 </div>
               )}
@@ -357,6 +445,7 @@ export const InteractiveAgent = ({ onClose }: { onClose?: () => void } = {}) => 
           ))}
           {isTyping && (
             <m.div
+              key="typing-dots"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className="flex items-start"
@@ -369,22 +458,49 @@ export const InteractiveAgent = ({ onClose }: { onClose?: () => void } = {}) => 
             </m.div>
           )}
         </AnimatePresence>
+        {/* Transient status while waiting for the first chunk — never enters the
+            transcript, so it can't pile up over a long conversation. Kept OUTSIDE
+            AnimatePresence: rapid re-renders from streamed chunks can strand its
+            exit animation and leave the line stuck on screen. aria-hidden:
+            screen readers get the sr-only srThinking line instead. */}
+        {streamPhase === 'pending' && (
+          <m.div
+            initial={prefersReduced ? { opacity: 1 } : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            aria-hidden="true"
+            className="flex items-start"
+          >
+            <div className="text-[10px] font-mono my-1 flex items-center gap-1.5 text-accent-text transition-colors duration-1000">
+              <Terminal className="w-3 h-3" />
+              <span className="bidi-plaintext" dir="auto">{assistant.analyzingMessage}</span>
+              <span className="inline-flex gap-1" aria-hidden="true">
+                <span className="w-1 h-1 rounded-full animate-bounce bg-accent" style={{ animationDelay: '0ms' }} />
+                <span className="w-1 h-1 rounded-full animate-bounce bg-accent" style={{ animationDelay: '150ms' }} />
+                <span className="w-1 h-1 rounded-full animate-bounce bg-accent" style={{ animationDelay: '300ms' }} />
+              </span>
+            </div>
+          </m.div>
+        )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Quick Prompts — 4.6: py-2 bumps chip hit area toward 44px */}
-      <div className="px-4 pb-2 flex gap-2 overflow-x-auto scrollbar-none">
-        {assistant.quickPrompts.map((prompt, i) => (
-          <button
-            key={i}
-            onClick={() => handleSend(prompt)}
-            disabled={isTyping}
-            className="whitespace-nowrap text-xs font-medium px-3 py-2 rounded-full border bg-surface border-line text-fg-1 hover:text-accent hover:border-accent/30 transition-[color,border-color,background-color] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:[box-shadow:var(--shadow-focus-ring)] outline-none"
-          >
-            {prompt}
-          </button>
-        ))}
-      </div>
+      {/* Quick Prompts — icebreakers only: once the visitor has asked something,
+          the row retires instead of inviting duplicate questions (returns after
+          /clear). 4.6: py-2 bumps chip hit area toward 44px */}
+      {!messages.some((msg) => msg.type === 'user') && (
+        <div className="px-4 pb-2 flex gap-2 overflow-x-auto scrollbar-none">
+          {assistant.quickPrompts.map((prompt, i) => (
+            <button
+              key={i}
+              onClick={() => handleSend(prompt)}
+              disabled={isTyping || streamPhase !== null}
+              className="whitespace-nowrap text-xs font-medium px-3 py-2 rounded-full border bg-surface border-line text-fg-1 hover:text-accent hover:border-accent/30 transition-[color,border-color,background-color] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:[box-shadow:var(--shadow-focus-ring)] outline-none"
+            >
+              {prompt}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Input Area */}
       <div className="p-4 pt-2 border-t border-line/50 bg-surface/30 transition-[background-color,border-color] duration-1000">
@@ -392,28 +508,44 @@ export const InteractiveAgent = ({ onClose }: { onClose?: () => void } = {}) => 
           onSubmit={(e) => { e.preventDefault(); handleSend(inputValue); }}
           className="relative flex items-center"
         >
-          {/* 4.2: localized aria-label; 4.5: visible focus ring replacing outline-none */}
+          {/* 4.2: localized aria-label; 4.5: visible focus ring replacing outline-none.
+              Never disabled — disabling would eject keyboard/AT focus to <body> on
+              every send, and typing a follow-up mid-stream is fine (a new send
+              aborts the in-flight one). */}
           <input
+            ref={inputRef}
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            disabled={isTyping}
             placeholder={matrixMode ? assistant.matrixInputPlaceholder : assistant.inputPlaceholder}
             aria-label={a11y.chatInput}
             dir={inputDirection}
-            className="w-full border rounded-xl py-3 text-sm outline-none bg-page border-line text-fg-0 placeholder:text-fg-2 focus-visible:[box-shadow:var(--shadow-focus-ring)] transition-[border-color,box-shadow,color,background-color] disabled:opacity-50"
+            className="w-full border rounded-xl py-3 text-sm outline-none bg-page border-line text-fg-0 placeholder:text-fg-2 focus-visible:[box-shadow:var(--shadow-focus-ring)] transition-[border-color,box-shadow,color,background-color]"
             style={{ paddingInlineStart: '1rem', paddingInlineEnd: '3rem', textAlign: 'start' }}
           />
-          {/* 4.2: localized aria-label; 4.6: h-11 w-11 inside the input — visually 36px, touch area padded */}
-          <button
-            type="submit"
-            disabled={!inputValue.trim() || isTyping}
-            aria-label={a11y.sendMessage}
-            className="absolute inline-flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-[var(--fg-on-accent)] hover:bg-accent-hover transition-[background-color] disabled:opacity-50 focus-visible:[box-shadow:var(--shadow-focus-ring)] outline-none"
-            style={{ insetInlineEnd: '0.5rem' }}
-          >
-            <Send className="w-4 h-4" aria-hidden="true" />
-          </button>
+          {/* 4.2: localized aria-label; 4.6: h-11 w-11 inside the input — visually 36px, touch area padded.
+              While an answer is in flight the button becomes a stop control. */}
+          {streamPhase !== null ? (
+            <button
+              type="button"
+              onClick={stopStreaming}
+              aria-label={assistant.stopLabel}
+              className="absolute inline-flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-[var(--fg-on-accent)] hover:bg-accent-hover transition-[background-color] focus-visible:[box-shadow:var(--shadow-focus-ring)] outline-none"
+              style={{ insetInlineEnd: '0.5rem' }}
+            >
+              <Square className="w-3.5 h-3.5" fill="currentColor" aria-hidden="true" />
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={!inputValue.trim() || isTyping}
+              aria-label={a11y.sendMessage}
+              className="absolute inline-flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-[var(--fg-on-accent)] hover:bg-accent-hover transition-[background-color] disabled:opacity-50 focus-visible:[box-shadow:var(--shadow-focus-ring)] outline-none"
+              style={{ insetInlineEnd: '0.5rem' }}
+            >
+              <Send className="w-4 h-4" aria-hidden="true" />
+            </button>
+          )}
         </form>
       </div>
     </TerminalFrame>

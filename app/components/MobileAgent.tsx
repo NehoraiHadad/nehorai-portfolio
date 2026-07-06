@@ -12,12 +12,15 @@ export const MobileAgent = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { a11y } = useDictionary();
   const fabRef = useRef<HTMLButtonElement>(null);
+  const chatInputRef = useRef<HTMLInputElement>(null);
   const dialogTitleId = useId();
 
-  // 4.1: focus trap inside MobileAgent dialog
+  // 4.1: focus trap inside MobileAgent dialog. Initial focus goes to the chat
+  // input (the terminal prompt), not the first focusable element (the X button).
   const trapRef = useFocusTrap<HTMLDivElement>({
     active: isOpen,
     restoreRef: fabRef,
+    initialFocusRef: chatInputRef,
   });
 
   // 4.1: set inert on main content while dialog is open
@@ -79,7 +82,7 @@ export const MobileAgent = () => {
                 exit={{ opacity: 0, y: 100, scale: 0.95 }}
                 className="relative w-full max-w-lg"
               >
-                <InteractiveAgent onClose={() => setIsOpen(false)} />
+                <InteractiveAgent onClose={() => setIsOpen(false)} inputRef={chatInputRef} />
               </m.div>
             </div>
           )}

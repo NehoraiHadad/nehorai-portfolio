@@ -134,28 +134,29 @@ export const enDictionary: AppDictionary = {
     matrixTitle: 'MATRIX // UPLINK',
     quickPrompts: ["What's your tech stack?", 'Show me your projects', 'How can we work together?'],
     initialMessages: [
-      { type: 'system', content: 'System initialized. Orchestrator online.' },
+      { type: 'system', content: 'System initialized. PortfolioAgent online.' },
       {
         type: 'agent',
         agentName: 'PortfolioAgent',
         content: "Hi. I'm a small assistant that can answer questions about Nehorai's stack, projects, and how to reach him.",
       },
     ],
-    clearedMessage: 'System memory cleared. Orchestrator re-initialized.',
-    helpMessage: 'Available commands: /clear, /help, /download_cv, /matrix',
-    downloadMessage: '> Orchestrator: Initiating secure file transfer... [Nehorai Hadad CV - SW.pdf]',
+    clearedMessage: 'System memory cleared. PortfolioAgent re-initialized.',
+    helpMessage:
+      "Ask me anything about Nehorai's stack, projects, or how to reach him. Commands: /clear, /download_cv, /matrix",
+    downloadMessage: '> System: Initiating secure file transfer... [Nehorai Hadad CV - SW.pdf]',
     matrixMessage: 'Wake up, Neo... The Matrix has you.',
-    analyzingMessage: '> Orchestrator: Analyzing intent...',
-    routingMessage: '> Orchestrator: Routing to {agentName}...',
+    analyzingMessage: 'PortfolioAgent: thinking...',
     errorMessage:
       "I couldn't reach the assistant service just now. Please try again in a moment — or email nehorai.hadad@gmail.com directly.",
-    inputPlaceholder: 'Ask the orchestrator...',
+    rateLimitMessage:
+      'Too many messages at once — give it a few seconds and try again.',
+    srThinking: 'Assistant is responding…',
+    stopLabel: 'Stop response',
+    inputPlaceholder: 'Ask PortfolioAgent...',
     matrixInputPlaceholder: 'Enter command...',
     agentNames: {
       portfolio: 'PortfolioAgent',
-      showcase: 'ShowcaseAgent',
-      tech: 'TechAgent',
-      contact: 'CommAgent',
     },
     intentKeywords: {
       commands: {
@@ -164,21 +165,6 @@ export const enDictionary: AppDictionary = {
         download: ['download', 'cv', 'resume', '/download_cv'],
         matrix: ['matrix', 'metrix', '/matrix'],
       },
-      routing: {
-        showcase: ['build', 'project', 'projects', 'case', 'show', 'portfolio'],
-        tech: ['stack', 'skill', 'skills', 'tech', 'technology'],
-        contact: ['contact', 'hire', 'work', 'together', 'email', 'reach'],
-      },
-    },
-    responses: {
-      default:
-        "I can answer questions about Nehorai's stack, projects, or how to reach him. Try asking about his tech, his projects, or working together.",
-      showcase:
-        'Five projects are featured: Podcasto, Agendo, Story Creator, and two live client sites — ykl.org.il and judah-brigade.vercel.app. Scroll to Selected Projects for the details.',
-      tech:
-        'Day-to-day stack: Next.js 15/16 + TypeScript on the front, Node and Python on the back, PostgreSQL/pgvector for data, AWS Lambda/SQS/DynamoDB for pipelines, and LangGraph / AWS AgentCore / MCP for agents. Eight years of on-prem Linux underneath it all.',
-      contact:
-        'Email: nehorai.hadad@gmail.com. Looking for full-stack or AI-engineer roles in Israel — hybrid or remote both work.',
     },
   },
   footer: {

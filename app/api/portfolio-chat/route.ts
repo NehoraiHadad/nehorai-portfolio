@@ -82,14 +82,76 @@ export async function POST(req: Request): Promise<Response> {
     const system = buildSystemPrompt(context, parsed.data.locale);
 
     const google = createGoogleGenerativeAI({ apiKey });
-    const result = streamText({
-      model: google('gemini-2.5-flash'),
-      system,
-      messages,
-      maxOutputTokens: 1024,
-    });
 
-    return result.toTextStreamResponse({ headers: { 'Cache-Control': 'no-store' } });
+    // Model fallback chain: each model has its own free-tier daily quota, so
+    // when gemini-2.5-flash is exhausted (a few dozen requests/day on the free
+    // tier) flash-lite keeps the chat alive. streamText surfaces provider
+    // failures as 'error' parts mid-stream, not thrown errors — so probe each
+    // model's stream until real text arrives before committing to a response.
+    for (const modelId of ['gemini-2.5-flash', 'gemini-2.5-flash-lite']) {
+      const result = streamText({
+        model: google(modelId),
+        system,
+        messages,
+        maxOutputTokens: 1024,
+        maxRetries: 1,
+      });
+
+      const parts = result.fullStream[Symbol.asyncIterator]();
+      let firstText: string | null = null;
+      let failed = false;
+      while (firstText === null && !failed) {
+        const { done, value } = await parts.next();
+        if (done) failed = true; // stream ended with no text at all
+        else if (value.type === 'text-delta') firstText = value.text;
+        else if (value.type === 'error') {
+          console.error(`[portfolio-chat] ${modelId} failed:`, value.error);
+          failed = true;
+        }
+      }
+      if (failed) continue;
+
+      const encoder = new TextEncoder();
+      const stream = new ReadableStream<Uint8Array>({
+        start(controller) {
+          controller.enqueue(encoder.encode(firstText!));
+        },
+        async pull(controller) {
+          // Drain until we can enqueue or close — a pull that resolves without
+          // doing either may never be called again by the runtime's stream
+          // bridge, which leaves the HTTP response hanging open.
+          for (;;) {
+            const { done, value } = await parts.next();
+            if (done) {
+              controller.close();
+              return;
+            }
+            if (value.type === 'text-delta') {
+              controller.enqueue(encoder.encode(value.text));
+              return;
+            }
+            if (value.type === 'error') {
+              // Mid-answer failure: end cleanly — the client keeps the partial.
+              console.error(`[portfolio-chat] ${modelId} mid-stream error:`, value.error);
+              controller.close();
+              return;
+            }
+          }
+        },
+      });
+
+      return new Response(stream, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'no-store',
+          'X-Portfolio-Chat-Model': modelId,
+        },
+      });
+    }
+
+    // Every model in the chain failed (quota, outage) — tell the client to
+    // retry later rather than streaming an empty 200.
+    return apiError(503, 'unavailable', 'The assistant is not available right now.');
   } catch (err) {
     console.error('[portfolio-chat] internal error:', err);
     return apiError(500, 'internal', 'An unexpected error occurred.');

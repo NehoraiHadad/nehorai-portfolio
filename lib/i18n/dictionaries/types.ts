@@ -170,17 +170,20 @@ export interface AppDictionary {
     helpMessage: string;
     downloadMessage: string;
     matrixMessage: string;
+    /** Transient status line shown only while waiting for the first streamed chunk. */
     analyzingMessage: string;
-    routingMessage: string;
     /** Agent-bubble fallback when the portfolio-chat API fails or is unreachable. */
     errorMessage: string;
+    /** Agent-bubble message when the per-IP rate limit trips (HTTP 429). */
+    rateLimitMessage: string;
+    /** Screen-reader-only announcement while an answer is being generated. */
+    srThinking: string;
+    /** aria-label for the stop-generation button shown while an answer streams. */
+    stopLabel: string;
     inputPlaceholder: string;
     matrixInputPlaceholder: string;
     agentNames: {
       portfolio: string;
-      showcase: string;
-      tech: string;
-      contact: string;
     };
     intentKeywords: {
       commands: {
@@ -189,17 +192,6 @@ export interface AppDictionary {
         download: string[];
         matrix: string[];
       };
-      routing: {
-        showcase: string[];
-        tech: string[];
-        contact: string[];
-      };
-    };
-    responses: {
-      default: string;
-      showcase: string;
-      tech: string;
-      contact: string;
     };
   };
   footer: {
