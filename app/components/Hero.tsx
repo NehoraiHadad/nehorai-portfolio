@@ -1535,8 +1535,8 @@ export const Hero = () => {
             {hero.primaryCta} <CtaArrow className="w-4 h-4" strokeWidth={1.5} />
           </a>
           <a
-            href={dossier.resumeFile}
-            download={dossier.resumeDownloadName}
+            href={dossier.resumeOptions[0].file}
+            download={dossier.resumeOptions[0].downloadName}
             className="btn btn-secondary w-full sm:w-auto px-8 py-3.5 hover:scale-[1.05] active:scale-[0.95] transition-transform duration-[var(--dur-1)]"
           >
             <FileText className="w-4 h-4" strokeWidth={1.5} />
