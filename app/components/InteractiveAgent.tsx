@@ -284,10 +284,11 @@ export const InteractiveAgent = ({
           content: assistant.downloadMessage
         }]);
         setIsTyping(false);
-        // 5.11: trigger the actual CV download — locale-aware PDF path from dictionary
+        // 5.11: trigger the actual CV download — resumeOptions[0] is the
+        // current locale's PDF; the dossier selector offers every variant.
         const link = document.createElement('a');
-        link.href = dossier.resumeFile;
-        link.download = dossier.resumeDownloadName;
+        link.href = dossier.resumeOptions[0].file;
+        link.download = dossier.resumeOptions[0].downloadName;
         link.style.display = 'none';
         document.body.appendChild(link);
         link.click();

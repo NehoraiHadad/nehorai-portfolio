@@ -8,7 +8,7 @@
  * Examples of what localizes:   form labels, section descriptions, human confirmations.
  */
 
-export type CaseStudyIconKey = 'podcast' | 'dashboard' | 'globe' | 'map' | 'book' | 'controls' | 'credits' | 'link' | 'palette' | 'dice';
+export type CaseStudyIconKey = 'podcast' | 'dashboard' | 'globe' | 'map' | 'book' | 'controls' | 'credits' | 'link' | 'palette' | 'dice' | 'bot' | 'utensils' | 'send';
 
 export interface CaseStudyContent {
   id: string;
@@ -25,6 +25,15 @@ export interface CaseStudyContent {
     githubUrl?: string;
     liveUrl?: string;
   };
+}
+
+export interface ResumeOption {
+  language: 'en' | 'he';
+  format: 'pdf' | 'docx';
+  label: string;
+  /** Public path under /public. */
+  file: string;
+  downloadName: string;
 }
 
 export interface SkillGroupContent {
@@ -116,8 +125,11 @@ export interface AppDictionary {
       stack: string;
     }>;
     resumeCta: string;
-    resumeFile: string;
-    resumeDownloadName: string;
+    /** All downloadable resume variants (language x format). The FIRST option
+     * is always the current locale's PDF: Hero's secondary CTA and the
+     * assistant's /download_cv command use resumeOptions[0]; the dossier
+     * renders the full selector. */
+    resumeOptions: ResumeOption[];
     contact: {
       emailLabel: string;
       githubLabel: string;

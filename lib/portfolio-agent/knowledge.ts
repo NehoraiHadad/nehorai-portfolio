@@ -8,8 +8,9 @@
 // Source-of-truth decision (see AI_PORTFOLIO_AGENT_PLAN.md): chunks are derived
 // programmatically from the i18n dictionaries — the same bilingual, reviewed
 // content the site already renders — so the agent can never drift from the
-// public site. Only content with no dictionary home (the boundaries stance) is
-// hand-written here. Anything private simply has no path into this file.
+// public site. Content with no dictionary home (the boundaries stance, the
+// background summary, and the external-validation record) is hand-written here.
+// Anything private simply has no path into this file.
 
 import { enDictionary } from '@/lib/i18n/dictionaries/en';
 import { heDictionary } from '@/lib/i18n/dictionaries/he';
@@ -33,6 +34,37 @@ const BOUNDARIES: Record<AgentLocale, string> = {
   ].join(' '),
 };
 
+// Background summary and external-validation record — public CV facts with no
+// dictionary home. Mirrors the approved resume wording (EN/HE CV, Sept 2026):
+// eval suites are "defined and run" by Nehorai, the hermes report is an
+// authorization issue (not a "vulnerability"), and exactly one npm package is
+// published (@nehorai/credits).
+const BACKGROUND: Record<AgentLocale, string> = {
+  en: [
+    'Nehorai Hadad — AI Engineer | Full-Stack Developer.',
+    '7+ years in on-prem infrastructure and datacenter operations (large-scale military datacenter environment; thousands of servers, plus networking and storage gear, mainly Cisco, HP and IBM) and 4+ years in software development.',
+    'Builds production agents, retrieval systems, automation, and full-stack products.',
+  ].join(' '),
+  he: [
+    'נהוראי חדד — AI Engineer | Full-Stack Developer.',
+    'יותר מ-7 שנים בתשתיות on-prem ותפעול דטה-סנטרים (סביבת דטה-סנטר צבאית בקנה מידה גדול; אלפי שרתים וציוד תקשורת ואחסון, בעיקר Cisco, HP ו-IBM) ויותר מ-4 שנים בפיתוח תוכנה.',
+    'בונה agents לפרודקשן, מערכות retrieval, אוטומציה ומוצרי full-stack.',
+  ].join(' '),
+};
+
+const EXTERNAL_VALIDATION: Record<AgentLocale, string> = {
+  en: [
+    'External validation: Nehorai reported an authorization issue in NousResearch/hermes-agent that was confirmed within about 72 minutes, and he is credited in an open follow-up PR.',
+    'He also has a merged PR in OpenClaw that suppresses model fallback notices in group conversations.',
+    'On npm he published @nehorai/credits v2.0.0 — a framework-agnostic credits/billing package with reserve, commit/release, and audit-journal flows.',
+  ].join(' '),
+  he: [
+    'אימות חיצוני: נהוראי דיווח על בעיית הרשאות ב-NousResearch/hermes-agent שאושרה תוך כ-72 דקות, ושמו מופיע ב-PR המשך פתוח.',
+    'יש לו גם PR שמוזג ב-OpenClaw שמדכא הודעות fallback של מודלים בשיחות קבוצתיות.',
+    'ב-npm פרסם את @nehorai/credits v2.0.0 — חבילת credits/חיוב framework-agnostic עם זרימות reserve, commit/release ויומן אודיט.',
+  ].join(' '),
+};
+
 // Hebrew tag synonyms — chunk content derived from he.ts is Hebrew, but tags
 // drive retrieval scoring, so Hebrew queries need Hebrew hooks too.
 const HE_TAGS: Record<string, string[]> = {
@@ -41,6 +73,8 @@ const HE_TAGS: Record<string, string[]> = {
   projects: ['פרויקט', 'פרויקטים', 'עבודות', 'בנית', 'בנה'],
   contact: ['קשר', 'צור קשר', 'מייל', 'אימייל', 'קורות חיים', 'לעבוד', 'יחד', 'העסקה'],
   boundaries: ['שכר', 'מחיר', 'מחירים', 'זמינות', 'פרטי'],
+  background: ['רקע', 'ניסיון', 'שנים', 'תשתיות', 'דטה-סנטר', 'קורות חיים'],
+  validation: ['אימות', 'קוד פתוח', 'תרומה', 'npm', 'hermes', 'openclaw'],
 };
 
 function localeTags(category: string, lang: AgentLocale): string[] {
@@ -116,9 +150,31 @@ function deriveChunks(dict: AppDictionary, lang: AgentLocale): KnowledgeChunk[] 
       `Email: ${dict.ownerContact.email}`,
       `GitHub: ${dict.ownerContact.githubUrl}`,
       `LinkedIn: ${dict.ownerContact.linkedinUrl}`,
-      `Resume (PDF): ${dict.dossier.resumeFile}`,
+      'Resume downloads:',
+      ...dict.dossier.resumeOptions.map((o) => `- ${o.label}: ${o.file}`),
     ].join('\n'),
     url: dict.ownerContact.githubUrl,
+    public: true,
+  });
+
+  chunks.push({
+    id: `background-${lang}`,
+    title: 'Background',
+    lang,
+    category: 'profile',
+    tags: ['background', 'experience', 'years', 'infrastructure', 'datacenter', 'cv', 'resume', '7+ years', ...localeTags('background', lang)],
+    content: BACKGROUND[lang],
+    public: true,
+  });
+
+  chunks.push({
+    id: `validation-${lang}`,
+    title: 'External Validation',
+    lang,
+    category: 'projects',
+    tags: ['open source', 'contribution', 'hermes', 'nousresearch', 'openclaw', 'npm', 'credits', 'merged pr', 'issue', ...localeTags('validation', lang)],
+    content: EXTERNAL_VALIDATION[lang],
+    url: 'https://www.npmjs.com/package/@nehorai/credits',
     public: true,
   });
 

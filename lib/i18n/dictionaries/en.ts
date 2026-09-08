@@ -80,8 +80,12 @@ export const enDictionary: AppDictionary = {
       { tag: 'INFRA', stack: 'Oracle Cloud · Docker · PM2 · On-prem' },
     ],
     resumeCta: 'Download Resume',
-    resumeFile: '/Nehorai Hadad CV - SW.pdf',
-    resumeDownloadName: 'Nehorai Hadad CV - SW.pdf',
+    resumeOptions: [
+      { language: 'en', format: 'pdf', label: 'English · PDF', file: '/Nehorai Hadad CV - EN.pdf', downloadName: 'Nehorai Hadad CV - EN.pdf' },
+      { language: 'en', format: 'docx', label: 'English · DOCX', file: '/Nehorai Hadad CV - EN.docx', downloadName: 'Nehorai Hadad CV - EN.docx' },
+      { language: 'he', format: 'pdf', label: 'עברית · PDF', file: '/Nehorai Hadad CV - HE.pdf', downloadName: 'Nehorai Hadad CV - HE.pdf' },
+      { language: 'he', format: 'docx', label: 'עברית · DOCX', file: '/Nehorai Hadad CV - HE.docx', downloadName: 'Nehorai Hadad CV - HE.docx' },
+    ],
     contact: {
       emailLabel: 'Email',
       githubLabel: 'GitHub',
@@ -144,7 +148,7 @@ export const enDictionary: AppDictionary = {
     clearedMessage: 'System memory cleared. NEO re-initialized.',
     helpMessage:
       "Ask me anything about Nehorai's stack, projects, or how to reach him. Commands: /clear, /download_cv, /matrix",
-    downloadMessage: '> System: Initiating secure file transfer... [Nehorai Hadad CV - SW.pdf]',
+    downloadMessage: '> System: Initiating secure file transfer... [Nehorai Hadad CV - EN.pdf] · Hebrew + DOCX versions are in the Contact section.',
     matrixMessage: 'Wake up, Neo... The Matrix has you.',
     analyzingMessage: 'NEO: thinking...',
     errorMessage:
@@ -177,6 +181,32 @@ export const enDictionary: AppDictionary = {
     linkedinUrl: 'https://linkedin.com/in/nehorai-hadad', // TODO: confirm LinkedIn slug
   },
   caseStudies: [
+    {
+      id: 'maane',
+      title: 'Maane',
+      tier: 'featured',
+      description:
+        'Hebrew-first knowledge agent in production — answers from the user\'s own content over WhatsApp and web, with retrieval grounding, a grounding judge, one refine round, a deterministic forbidden-topic gate, and a controlled tool loop.',
+      impact:
+        'Content-hash, model-aware indexing over atomic claims; debounced turn batching and idempotent delivery; QA across multi-turn, distractor, media, and answer-language eval suites he defined and runs.',
+      tags: ['RAG', 'WhatsApp + Web', 'Grounding judge', 'Eval suites', 'Production'],
+      icon: 'bot',
+      details: {
+        challenge:
+          'A knowledge agent that answers in the user\'s voice must stay grounded — no invented facts, no off-limits topics, no duplicate sends.',
+        solution:
+          'Retrieval grounding with an independent grounding judge and a single refine round keeps answers inside the sources; a deterministic forbidden-topic gate and a controlled tool loop bound behavior; content-hash, model-aware indexing stores atomic claims; debounced turn batching and idempotent delivery make WhatsApp sends exactly-once.',
+        architecture: [
+          'WhatsApp + web agent',
+          'Retrieval grounding (RAG)',
+          'Grounding judge + one refine round',
+          'Deterministic forbidden-topic gate',
+          'Content-hash indexing · atomic claims',
+          'Idempotent delivery',
+        ],
+        liveUrl: 'https://maane.app',
+      },
+    },
     {
       id: 'podcasto',
       title: 'Podcasto',
@@ -285,9 +315,9 @@ export const enDictionary: AppDictionary = {
       title: 'nehorai-plugins',
       tier: 'featured',
       description:
-        'A published suite of 9 @nehorai/* npm packages built as a ports-and-adapters monorepo — a credits/billing system with a two-phase commit, plus a payment-orchestration layer with a circuit breaker and pluggable providers (Stripe, Israeli gateways, SUMIT).',
-      impact: 'Published to npm and reused across products — drop-in credits and payment orchestration instead of re-implementing billing in every app.',
-      tags: ['npm · 9 packages', 'TypeScript', 'Credits + Payments', 'Circuit breaker', 'Ports & adapters'],
+        'A TypeScript ports-and-adapters monorepo of 9 @nehorai/* packages — a credits/billing system with a two-phase commit, plus a payment-orchestration layer with a circuit breaker and pluggable providers (Stripe, Israeli gateways, SUMIT).',
+      impact: '@nehorai/credits v2.0.0 published on npm — drop-in reserve, commit/release, and audit-journal flows instead of re-implementing billing in every app.',
+      tags: ['npm · @nehorai/credits', 'TypeScript', 'Credits + Payments', 'Circuit breaker', 'Ports & adapters'],
       icon: 'credits',
       details: {
         challenge:
@@ -297,7 +327,7 @@ export const enDictionary: AppDictionary = {
         architecture: [
           'TypeScript monorepo (pnpm)',
           'Ports & adapters',
-          '9 published @nehorai/* packages',
+          '9 @nehorai/* packages (pnpm monorepo)',
           'Two-phase commit (credits)',
           'Circuit breaker + multi-provider routing (payments)',
           'Stripe / Hyp / Cardcom / SUMIT providers',
@@ -410,6 +440,41 @@ export const enDictionary: AppDictionary = {
         liveUrl: 'https://dorgames.co.il/',
       },
     },
+    {
+      id: 'our-recipes',
+      title: 'Our Recipes',
+      tier: 'compact',
+      description:
+        'Hebrew-first family recipe app — recipes posted to a Telegram channel are AI-formatted and stored in PostgreSQL, the system\'s source of truth.',
+      impact: 'Live — the family\'s recipe archive, structured and searchable.',
+      tags: ['Next.js', 'FastAPI', 'PostgreSQL', 'Telegram bot'],
+      icon: 'utensils',
+      details: {
+        challenge: 'Family recipes were scattered across a Telegram channel with no structure or search.',
+        solution:
+          'A Telegram bot captures posted recipes, Gemini formats them into a structured schema, and PostgreSQL (Prisma) stores them as the source of truth behind a Hebrew-first Next.js UI.',
+        architecture: ['Next.js', 'FastAPI', 'PostgreSQL + Prisma', 'Telegram bot', 'Gemini'],
+        liveUrl: 'https://our-recipes-web-nextjs.vercel.app',
+        githubUrl: 'https://github.com/NehoraiHadad/ourrecipesweb',
+      },
+    },
+    {
+      id: 'telegraph-mcp',
+      title: 'Telegraph SDK + MCP',
+      tier: 'compact',
+      description:
+        'TypeScript SDK and MCP server for the Telegraph API — create and manage Telegraph pages from Claude and other LLM clients.',
+      impact: 'Turns any MCP-capable agent into a Telegraph publisher.',
+      tags: ['TypeScript', 'MCP', 'Telegraph API'],
+      icon: 'send',
+      details: {
+        challenge: 'Telegraph has no official MCP interface, so agents cannot create or manage pages on their own.',
+        solution:
+          'A typed SDK wrapper plus an MCP server that exposes Telegraph page operations as tools any LLM client can call.',
+        architecture: ['TypeScript', 'Model Context Protocol', 'Telegraph API'],
+        githubUrl: 'https://github.com/NehoraiHadad/telegraph-mcp',
+      },
+    },
   ],
   skills: [
     { category: 'AI & Agents', items: ['LangGraph', 'AWS AgentCore', 'Strands Agents SDK', 'MCP', 'RAG + pgvector'] },
@@ -417,7 +482,7 @@ export const enDictionary: AppDictionary = {
     { category: 'Backend & Data', items: ['Node.js', 'Python', 'PostgreSQL', 'Supabase + Drizzle'] },
     {
       category: 'Cloud & Infra',
-      items: ['AWS (Lambda, SQS, SES, DynamoDB)', 'Docker + PM2', '8 yrs on-prem datacenter', 'Server hardware & physical infra'],
+      items: ['AWS (Lambda, SQS, SES, DynamoDB)', 'Docker + PM2', '7+ yrs on-prem datacenter', 'Server hardware & physical infra'],
     },
   ],
   admin: {

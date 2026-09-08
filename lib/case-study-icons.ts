@@ -1,4 +1,4 @@
-import { BookOpen, Coins, Dices, Globe, LayoutDashboard, Link2, Map, Palette, Podcast, SlidersHorizontal } from 'lucide-react';
+import { BookOpen, Bot, Coins, Dices, Globe, LayoutDashboard, Link2, Map, Palette, Podcast, Send, SlidersHorizontal, UtensilsCrossed } from 'lucide-react';
 import type { ElementType } from 'react';
 import type { CaseStudyIconKey } from './i18n/dictionaries/types';
 
@@ -13,4 +13,7 @@ export const caseStudyIcons: Record<CaseStudyIconKey, ElementType> = {
   link: Link2,
   palette: Palette,
   dice: Dices,
+  bot: Bot,
+  utensils: UtensilsCrossed,
+  send: Send,
 };

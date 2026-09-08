@@ -241,18 +241,32 @@ export const Dossier = () => {
               ))}
             </div>
 
-            {/* CV */}
-            <m.a
-              whileHover={{ x: isRtl ? -4 : 4 }}
-              href={dossier.resumeFile}
-              download={dossier.resumeDownloadName}
-              className="inline-flex items-center gap-3 text-fg-1 hover:text-fg-0 transition-colors text-sm font-medium w-fit group"
-            >
-              <span className="w-8 h-8 rounded-lg border border-line group-hover:border-line-strong flex items-center justify-center transition-colors">
-                <FileText className="w-3.5 h-3.5" />
-              </span>
-              {dossier.resumeCta}
-            </m.a>
+            {/* CV — language x format selector */}
+            <div>
+              <m.div
+                whileHover={{ x: isRtl ? -4 : 4 }}
+                className="inline-flex items-center gap-3 text-fg-1 text-sm font-medium w-fit group"
+              >
+                <span className="w-8 h-8 rounded-lg border border-line group-hover:border-line-strong flex items-center justify-center transition-colors">
+                  <FileText className="w-3.5 h-3.5" />
+                </span>
+                {dossier.resumeCta}
+              </m.div>
+              <div className="flex flex-wrap gap-2 mt-3">
+                {dossier.resumeOptions.map((option) => (
+                  <a
+                    key={`${option.language}-${option.format}`}
+                    href={option.file}
+                    download={option.downloadName}
+                    className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest px-3 py-1.5 rounded border border-line text-fg-2 hover:text-accent hover:border-accent/50 transition-colors"
+                    dir="ltr"
+                  >
+                    <FileText className="w-3 h-3 shrink-0" aria-hidden="true" />
+                    {option.label}
+                  </a>
+                ))}
+              </div>
+            </div>
 
             {/* Direct contact chips */}
             <div className="flex flex-wrap gap-2 pt-2">

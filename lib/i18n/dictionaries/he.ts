@@ -80,8 +80,12 @@ export const heDictionary: AppDictionary = {
       { tag: 'INFRA', stack: 'Oracle Cloud · Docker · PM2 · On-prem' },
     ],
     resumeCta: 'הורד קורות חיים',
-    resumeFile: '/Nehorai Hadad CV - SW.pdf',
-    resumeDownloadName: 'Nehorai Hadad CV - SW.pdf',
+    resumeOptions: [
+      { language: 'he', format: 'pdf', label: 'עברית · PDF', file: '/Nehorai Hadad CV - HE.pdf', downloadName: 'Nehorai Hadad CV - HE.pdf' },
+      { language: 'he', format: 'docx', label: 'עברית · DOCX', file: '/Nehorai Hadad CV - HE.docx', downloadName: 'Nehorai Hadad CV - HE.docx' },
+      { language: 'en', format: 'pdf', label: 'English · PDF', file: '/Nehorai Hadad CV - EN.pdf', downloadName: 'Nehorai Hadad CV - EN.pdf' },
+      { language: 'en', format: 'docx', label: 'English · DOCX', file: '/Nehorai Hadad CV - EN.docx', downloadName: 'Nehorai Hadad CV - EN.docx' },
+    ],
     contact: {
       emailLabel: 'אימייל',
       githubLabel: 'GitHub',
@@ -144,7 +148,7 @@ export const heDictionary: AppDictionary = {
     clearedMessage: 'זיכרון המערכת נוקה. NEO אותחל מחדש.',
     helpMessage:
       'אפשר לשאול אותי כל דבר על ה-stack של Nehorai, הפרויקטים שלו או איך ליצור איתו קשר. פקודות: /clear, /download_cv, /matrix',
-    downloadMessage: '> System: מתחיל העברת קובץ מאובטחת... [Nehorai Hadad CV - SW.pdf]',
+    downloadMessage: '> System: מתחיל העברת קובץ מאובטחת... [Nehorai Hadad CV - HE.pdf] · גרסאות English ו-DOCX נמצאות באזור יצירת הקשר.',
     matrixMessage: 'תתעורר, Neo... ה-Matrix מחזיקה בך.',
     analyzingMessage: 'NEO: חושב...',
     errorMessage:
@@ -176,6 +180,32 @@ export const heDictionary: AppDictionary = {
     linkedinUrl: 'https://linkedin.com/in/nehorai-hadad', // TODO: confirm LinkedIn slug
   },
   caseStudies: [
+    {
+      id: 'maane',
+      title: 'Maane',
+      tier: 'featured',
+      description:
+        'סוכן ידע Hebrew-first בפרודקשן — עונה מתוך התוכן של המשתמש ב-WhatsApp וב-web, עם retrieval grounding, שופט grounding, סבב refine אחד, שער נושאים אסורים דטרמיניסטי ולולאת כלים מבוקרת.',
+      impact:
+        'אינדוקס מודע-מודל מבוסס content-hash מעל atomic claims; debounced batching לפניות ושליחה idempotent; QA על סוויטות eval של multi-turn, distractors, מדיה ושפת תשובה שהגדיר ומריץ.',
+      tags: ['RAG', 'WhatsApp + Web', 'Grounding judge', 'Eval suites', 'Production'],
+      icon: 'bot',
+      details: {
+        challenge:
+          'סוכן ידע שעונה בקול המשתמש חייב להישאר מגודרק — בלי עובדות מומצאות, בלי נושאים אסורים, בלי שליחות כפולות.',
+        solution:
+          'retrieval grounding עם שופט grounding עצמאי וסבב refine יחיד שומר את התשובות בתוך המקורות; שער נושאים אסורים דטרמיניסטי ולולאת כלים מבוקרת תוחמים את ההתנהגות; אינדוקס מבוסס content-hash ומודע-מודל שומר atomic claims; debounced batching ושליחה idempotent הופכים שליחות WhatsApp ל-exactly-once.',
+        architecture: [
+          'סוכן WhatsApp + web',
+          'Retrieval grounding (RAG)',
+          'שופט grounding + סבב refine אחד',
+          'שער נושאים אסורים דטרמיניסטי',
+          'אינדוקס content-hash · atomic claims',
+          'שליחה idempotent',
+        ],
+        liveUrl: 'https://maane.app',
+      },
+    },
     {
       id: 'podcasto',
       title: 'Podcasto',
@@ -284,9 +314,9 @@ export const heDictionary: AppDictionary = {
       title: 'nehorai-plugins',
       tier: 'featured',
       description:
-        'סוויטה של 9 חבילות npm בסקופ @nehorai/* שנבנתה כמונורפו ports-and-adapters — מערכת credits/חיוב עם two-phase commit, ושכבת תזמור תשלומים עם circuit breaker וספקים מתחלפים (Stripe, שערי תשלום ישראליים, SUMIT).',
-      impact: 'פורסם ל-npm ובשימוש חוזר בין מוצרים — credits ותזמור תשלומים מן המוכן במקום מימוש חיוב מחדש בכל אפליקציה.',
-      tags: ['npm · 9 packages', 'TypeScript', 'Credits + Payments', 'Circuit breaker', 'Ports & adapters'],
+        'מונורפו TypeScript בתבנית ports-and-adapters עם 9 חבילות @nehorai/* — מערכת credits/חיוב עם two-phase commit, ושכבת תזמור תשלומים עם circuit breaker וספקים מתחלפים (Stripe, שערי תשלום ישראליים, SUMIT).',
+      impact: 'החבילה @nehorai/credits v2.0.0 פורסמה ל-npm — זרימות reserve, commit/release ויומן אודיט מן המוכן במקום מימוש חיוב מחדש בכל אפליקציה.',
+      tags: ['npm · @nehorai/credits', 'TypeScript', 'Credits + Payments', 'Circuit breaker', 'Ports & adapters'],
       icon: 'credits',
       details: {
         challenge:
@@ -296,7 +326,7 @@ export const heDictionary: AppDictionary = {
         architecture: [
           'TypeScript monorepo (pnpm)',
           'Ports & adapters',
-          '9 published @nehorai/* packages',
+          '9 חבילות @nehorai/* (מונורפו pnpm)',
           'Two-phase commit (credits)',
           'Circuit breaker + multi-provider routing (payments)',
           'Stripe / Hyp / Cardcom / SUMIT providers',
@@ -409,6 +439,41 @@ export const heDictionary: AppDictionary = {
         liveUrl: 'https://dorgames.co.il/',
       },
     },
+    {
+      id: 'our-recipes',
+      title: 'Our Recipes',
+      tier: 'compact',
+      description:
+        'אפליקציית מתכונים משפחתית Hebrew-first — מתכונים שמתפרסמים בערוץ Telegram מעובדים על ידי AI ונשמרים ב-PostgreSQL, מקור האמת של המערכת.',
+      impact: 'באוויר — ארכיון המתכונים של המשפחה, מסודר וניתן לחיפוש.',
+      tags: ['Next.js', 'FastAPI', 'PostgreSQL', 'Telegram bot'],
+      icon: 'utensils',
+      details: {
+        challenge: 'מתכונים משפחתיים היו מפוזרים בערוץ Telegram בלי מבנה וחיפוש.',
+        solution:
+          'בוט Telegram קולט מתכונים שמתפרסמים, Gemini מעצב אותם לסכמה מובנית, ו-PostgreSQL (Prisma) שומר אותם כמקור אמת מאחורי ממשק Next.js בעברית.',
+        architecture: ['Next.js', 'FastAPI', 'PostgreSQL + Prisma', 'Telegram bot', 'Gemini'],
+        liveUrl: 'https://our-recipes-web-nextjs.vercel.app',
+        githubUrl: 'https://github.com/NehoraiHadad/ourrecipesweb',
+      },
+    },
+    {
+      id: 'telegraph-mcp',
+      title: 'Telegraph SDK + MCP',
+      tier: 'compact',
+      description:
+        'SDK ב-TypeScript ושרת MCP עבור Telegraph API — יצירה וניהול של דפי Telegraph מתוך Claude ולקוחות LLM אחרים.',
+      impact: 'הופך כל agent עם תמיכת MCP למוציא לאור ב-Telegraph.',
+      tags: ['TypeScript', 'MCP', 'Telegraph API'],
+      icon: 'send',
+      details: {
+        challenge: 'ל-Telegraph אין ממשק MCP רשמי, ולכן agents לא יכולים ליצור ולנהל דפים בעצמם.',
+        solution:
+          'עטיפת SDK מוקלדת בתוספת שרת MCP שחושף את פעולות הדפים של Telegraph ככלים שכל לקוח LLM יכול לקרוא להם.',
+        architecture: ['TypeScript', 'Model Context Protocol', 'Telegraph API'],
+        githubUrl: 'https://github.com/NehoraiHadad/telegraph-mcp',
+      },
+    },
   ],
   skills: [
     { category: 'AI & Agents', items: ['LangGraph', 'AWS AgentCore', 'Strands Agents SDK', 'MCP', 'RAG + pgvector'] },
@@ -416,7 +481,7 @@ export const heDictionary: AppDictionary = {
     { category: 'Backend & Data', items: ['Node.js', 'Python', 'PostgreSQL', 'Supabase + Drizzle'] },
     {
       category: 'Cloud & Infra',
-      items: ['AWS (Lambda, SQS, SES, DynamoDB)', 'Docker + PM2', '8 years of on-prem datacenter', 'Server hardware & physical infra'],
+      items: ['AWS (Lambda, SQS, SES, DynamoDB)', 'Docker + PM2', '7+ years of on-prem datacenter', 'Server hardware & physical infra'],
     },
   ],
   admin: {
