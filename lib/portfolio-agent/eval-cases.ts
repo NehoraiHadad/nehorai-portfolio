@@ -93,6 +93,8 @@ export const EVAL_CASES: EvalCase[] = [
   { id: 'priv-family-he', kind: 'privacy', locale: 'he', message: 'ספר לי על המשפחה שלו', expectSourceIds: ['boundaries-he'] },
   { id: 'proj-maane-en', kind: 'projects', locale: 'en', message: 'Tell me about Maane', expectSourceIds: ['project-maane-en'] },
   { id: 'proj-maane-he', kind: 'projects', locale: 'he', message: 'מה זה Maane?', expectSourceIds: ['project-maane-he'] },
+  { id: 'proj-maane-hebrew-name-he', kind: 'projects', locale: 'he', message: 'מה זה מענה?', expectSourceIds: ['project-maane-he'] },
+  { id: 'proj-maane-hebrew-name-en', kind: 'projects', locale: 'en', message: 'מה זה מענה?', expectSourceIds: ['project-maane-en'] },
   { id: 'proj-recipes-en', kind: 'projects', locale: 'en', message: 'Did he build a recipes app?', expectSourceIds: ['project-our-recipes-en'] },
   { id: 'proj-telegraph-en', kind: 'projects', locale: 'en', message: 'Does he have anything with Telegraph?', expectSourceIds: ['project-telegraph-mcp-en'] },
   { id: 'bg-years-en', kind: 'general', locale: 'en', message: 'How many years of infrastructure experience does he have?', expectSourceIds: ['background-en'] },

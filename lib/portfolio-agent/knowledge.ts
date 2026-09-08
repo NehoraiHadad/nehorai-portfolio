@@ -83,6 +83,11 @@ function localeTags(category: string, lang: AgentLocale): string[] {
   return lang === 'he' ? (HE_TAGS[category] ?? []) : [];
 }
 
+// Visitors can use a project's Hebrew name even when the UI is English.
+const PROJECT_ALIASES: Record<string, string[]> = {
+  maane: ['מענה'],
+};
+
 function deriveChunks(dict: AppDictionary, lang: AgentLocale): KnowledgeChunk[] {
   const chunks: KnowledgeChunk[] = [];
 
@@ -133,6 +138,7 @@ function deriveChunks(dict: AppDictionary, lang: AgentLocale): KnowledgeChunk[] 
         'projects',
         study.id,
         study.title.toLowerCase(),
+        ...(PROJECT_ALIASES[study.id] ?? []),
         ...study.tags.map((t) => t.toLowerCase()),
         ...localeTags('projects', lang),
       ],
