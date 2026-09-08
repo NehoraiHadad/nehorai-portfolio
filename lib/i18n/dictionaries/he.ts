@@ -314,9 +314,9 @@ export const heDictionary: AppDictionary = {
       title: 'nehorai-plugins',
       tier: 'featured',
       description:
-        'מונורפו TypeScript בתבנית ports-and-adapters עם 9 חבילות @nehorai/* — מערכת credits/חיוב עם two-phase commit, ושכבת תזמור תשלומים עם circuit breaker וספקים מתחלפים (Stripe, שערי תשלום ישראליים, SUMIT).',
-      impact: 'החבילה @nehorai/credits v2.0.0 פורסמה ל-npm — זרימות reserve, commit/release ויומן אודיט מן המוכן במקום מימוש חיוב מחדש בכל אפליקציה.',
-      tags: ['npm · @nehorai/credits', 'TypeScript', 'Credits + Payments', 'Circuit breaker', 'Ports & adapters'],
+        'מונורפו TypeScript בתבנית ports-and-adapters עם 11 חבילות @nehorai/* — מערכת credits/חיוב עם two-phase commit, ושכבת תזמור תשלומים עם circuit breaker וספקים מתחלפים (Stripe, שערי תשלום ישראליים, SUMIT).',
+      impact: 'כל 11 החבילות פורסמו ל-npm — @nehorai/credits v2.0.0 מובילה את משפחת ה-credits עם זרימות reserve, commit/release ויומן אודיט מן המוכן במקום מימוש חיוב מחדש בכל אפליקציה.',
+      tags: ['npm · 11 חבילות @nehorai/* שפורסמו', 'TypeScript', 'Credits + Payments', 'Circuit breaker', 'Ports & adapters'],
       icon: 'credits',
       details: {
         challenge:
@@ -326,7 +326,7 @@ export const heDictionary: AppDictionary = {
         architecture: [
           'TypeScript monorepo (pnpm)',
           'Ports & adapters',
-          '9 חבילות @nehorai/* (מונורפו pnpm)',
+          '11 חבילות @nehorai/* (מונורפו pnpm, כולן פורסמו ל-npm)',
           'Two-phase commit (credits)',
           'Circuit breaker + multi-provider routing (payments)',
           'Stripe / Hyp / Cardcom / SUMIT providers',

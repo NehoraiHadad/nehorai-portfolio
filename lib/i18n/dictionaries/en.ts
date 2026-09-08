@@ -315,9 +315,9 @@ export const enDictionary: AppDictionary = {
       title: 'nehorai-plugins',
       tier: 'featured',
       description:
-        'A TypeScript ports-and-adapters monorepo of 9 @nehorai/* packages — a credits/billing system with a two-phase commit, plus a payment-orchestration layer with a circuit breaker and pluggable providers (Stripe, Israeli gateways, SUMIT).',
-      impact: '@nehorai/credits v2.0.0 published on npm — drop-in reserve, commit/release, and audit-journal flows instead of re-implementing billing in every app.',
-      tags: ['npm · @nehorai/credits', 'TypeScript', 'Credits + Payments', 'Circuit breaker', 'Ports & adapters'],
+        'A TypeScript ports-and-adapters monorepo of 11 @nehorai/* packages — a credits/billing system with a two-phase commit, plus a payment-orchestration layer with a circuit breaker and pluggable providers (Stripe, Israeli gateways, SUMIT).',
+      impact: 'All 11 packages published on npm — @nehorai/credits v2.0.0 leads the credits family with drop-in reserve, commit/release, and audit-journal flows instead of re-implementing billing in every app.',
+      tags: ['npm · 11 published @nehorai/* packages', 'TypeScript', 'Credits + Payments', 'Circuit breaker', 'Ports & adapters'],
       icon: 'credits',
       details: {
         challenge:
@@ -327,7 +327,7 @@ export const enDictionary: AppDictionary = {
         architecture: [
           'TypeScript monorepo (pnpm)',
           'Ports & adapters',
-          '9 @nehorai/* packages (pnpm monorepo)',
+          '11 @nehorai/* packages (pnpm monorepo, all published on npm)',
           'Two-phase commit (credits)',
           'Circuit breaker + multi-provider routing (payments)',
           'Stripe / Hyp / Cardcom / SUMIT providers',

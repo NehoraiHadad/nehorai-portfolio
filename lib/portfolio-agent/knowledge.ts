@@ -37,8 +37,10 @@ const BOUNDARIES: Record<AgentLocale, string> = {
 // Background summary and external-validation record — public CV facts with no
 // dictionary home. Mirrors the approved resume wording (EN/HE CV, Sept 2026):
 // eval suites are "defined and run" by Nehorai, the hermes report is an
-// authorization issue (not a "vulnerability"), and exactly one npm package is
-// published (@nehorai/credits).
+// authorization issue (not a "vulnerability"), and 14 npm packages are
+// published under his maintainer account: the 11 @nehorai/* credits and
+// payments packages from the nehorai-plugins monorepo, plus telegraph-mcp,
+// telegraph-api-client and @nehoraihadad/neo-agent.
 const BACKGROUND: Record<AgentLocale, string> = {
   en: [
     'Nehorai Hadad — AI Engineer | Full-Stack Developer.',
@@ -56,12 +58,12 @@ const EXTERNAL_VALIDATION: Record<AgentLocale, string> = {
   en: [
     'External validation: Nehorai reported an authorization issue in NousResearch/hermes-agent that was confirmed within about 72 minutes, and he is credited in an open follow-up PR.',
     'He also has a merged PR in OpenClaw that suppresses model fallback notices in group conversations.',
-    'On npm he published @nehorai/credits v2.0.0 — a framework-agnostic credits/billing package with reserve, commit/release, and audit-journal flows.',
+    'On npm he has 14 published packages, including the full credits and payments families from his nehorai-plugins monorepo (11 @nehorai/* packages — @nehorai/credits v2.0.0 leads the credits family, a framework-agnostic credits/billing package with reserve, commit/release, and audit-journal flows).',
   ].join(' '),
   he: [
     'אימות חיצוני: נהוראי דיווח על בעיית הרשאות ב-NousResearch/hermes-agent שאושרה תוך כ-72 דקות, ושמו מופיע ב-PR המשך פתוח.',
     'יש לו גם PR שמוזג ב-OpenClaw שמדכא הודעות fallback של מודלים בשיחות קבוצתיות.',
-    'ב-npm פרסם את @nehorai/credits v2.0.0 — חבילת credits/חיוב framework-agnostic עם זרימות reserve, commit/release ויומן אודיט.',
+    'ב-npm פרסם 14 חבילות, כולל משפחות ה-credits והתשלומים המלאות מתוך מונורפו nehorai-plugins (11 חבילות @nehorai/* — בראשן @nehorai/credits v2.0.0, חבילת credits/חיוב framework-agnostic עם זרימות reserve, commit/release ויומן אודיט).',
   ].join(' '),
 };
 
