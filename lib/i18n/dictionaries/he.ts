@@ -231,7 +231,7 @@ export const heDictionary: AppDictionary = {
           'Gemini 2.5 Flash TTS',
           'CloudWatch',
         ],
-        liveUrl: 'https://podcasto.org',
+        liveUrl: 'https://podcasto.app',
         githubUrl: 'https://github.com/NehoraiHadad/Podcasto',
       },
     },
