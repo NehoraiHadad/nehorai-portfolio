@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>רדאר שישי · 11.9.2026 · קריאת עומק מסוננת</title>
+<meta name="description" content="רדאר טכנולוגי שבועי: 6 פריטים נכנסו, 4 עברו סינון ואומתו מול המקור. GPT-Live-1, Agents API, GPT-6 Astra ו-DeepSeek V4.1-Flash.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f4ef; --card:#ffffff; --ink:#1c1a17; --ink-soft:#5b564e; --line:#e6e1d7;
+  --accent:#2f5fe0; --accent-soft:#eaf0fe; --teal:#0e7a6d; --teal-soft:#e3f3f0;
+  --warn-bg:#fff4e5; --warn-line:#f0a832; --warn-ink:#8a5410;
+  --danger-bg:#fdeceb; --danger-line:#e05555; --danger-ink:#8f2323;
+  --drop-bg:#f1efe9; --radius:18px;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Heebo',-apple-system,'Segoe UI',Arial,sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.65;
+  font-size:16px; -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:760px; margin:0 auto; padding:20px 16px 48px}
+header.hero{padding:26px 4px 18px}
+.kicker{display:inline-block; font-size:13px; font-weight:700; letter-spacing:.04em; color:var(--accent); background:var(--accent-soft); border-radius:999px; padding:4px 14px; margin-bottom:12px}
+h1{font-size:clamp(26px,6.4vw,38px); font-weight:800; line-height:1.25; margin-bottom:8px}
+.subtitle{color:var(--ink-soft); font-size:15px; max-width:56ch}
+.stats{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px}
+.stat{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:10px 14px; font-size:13.5px; font-weight:600}
+.stat b{font-size:20px; display:block; line-height:1.2}
+.stat.pass b{color:var(--teal)} .stat.drop b{color:#a3541f} .stat.total b{color:var(--accent)}
+/* Warning banner */
+.banner{
+  margin:18px 0 22px; background:var(--danger-bg); border:1.5px solid var(--danger-line);
+  border-radius:var(--radius); padding:16px 18px; position:relative; overflow:hidden;
+}
+.banner::before{content:""; position:absolute; inset-inline-start:0; top:0; bottom:0; width:5px; background:var(--danger-line)}
+.banner h2{color:var(--danger-ink); font-size:17px; font-weight:800; margin-bottom:6px; display:flex; align-items:center; gap:8px}
+.banner p{font-size:15px; color:#5c2424}
+.banner .pill{display:inline-block; margin-top:10px; background:#fff; border:1px solid var(--danger-line); color:var(--danger-ink); font-weight:700; font-size:13px; border-radius:999px; padding:3px 12px}
+/* Controls */
+.controls{display:flex; justify-content:space-between; align-items:center; margin:6px 2px 14px}
+.controls .label{font-size:13.5px; color:var(--ink-soft); font-weight:600}
+.toggle-all{background:var(--card); border:1px solid var(--line); border-radius:999px; padding:7px 16px; font-family:inherit; font-size:13.5px; font-weight:700; color:var(--accent); cursor:pointer}
+.toggle-all:active{transform:scale(.97)}
+/* Cards */
+details.card{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  margin-bottom:16px; overflow:hidden; box-shadow:0 1px 3px rgba(28,26,23,.05);
+  transition:box-shadow .2s ease;
+}
+details.card[open]{box-shadow:0 6px 24px rgba(28,26,23,.09)}
+summary{
+  list-style:none; cursor:pointer; padding:18px 18px 16px; display:flex; gap:14px; align-items:flex-start;
+  -webkit-tap-highlight-color:transparent;
+}
+summary::-webkit-details-marker{display:none}
+.num{
+  flex:0 0 auto; width:38px; height:38px; border-radius:12px; background:var(--accent-soft);
+  color:var(--accent); font-weight:800; font-size:17px; display:flex; align-items:center; justify-content:center;
+  margin-top:2px;
+}
+.card:nth-of-type(2) .num{background:var(--teal-soft); color:var(--teal)}
+.card:nth-of-type(3) .num{background:#f3eaff; color:#6d3fd4}
+.card:nth-of-type(4) .num{background:#fff0e0; color:#b45e10}
+.s-title{font-size:18.5px; font-weight:800; line-height:1.35}
+.s-teaser{font-size:14px; color:var(--ink-soft); margin-top:3px}
+.badges{display:flex; flex-wrap:wrap; gap:6px; margin-top:9px}
+.badge{font-size:11.5px; font-weight:700; border-radius:999px; padding:2.5px 10px; background:var(--teal-soft); color:var(--teal)}
+.badge.warn{background:var(--danger-bg); color:var(--danger-ink)}
+.badge.price{background:var(--accent-soft); color:var(--accent)}
+.badge.unverified{background:#fdf0f6; color:#a12b6b}
+.chev{flex:0 0 auto; margin-inline-start:auto; align-self:center; width:26px; height:26px; border-radius:50%; background:var(--bg); display:flex; align-items:center; justify-content:center; transition:transform .25s ease}
+.chev svg{width:13px; height:13px; stroke:var(--ink-soft); stroke-width:2.6; fill:none; stroke-linecap:round; stroke-linejoin:round}
+details[open] .chev{transform:rotate(180deg)}
+.card-body{padding:0 18px 20px; border-top:1px dashed var(--line)}
+.card-body section{margin-top:16px}
+.card-body h3{font-size:13px; font-weight:800; letter-spacing:.05em; color:var(--ink-soft); text-transform:uppercase; margin-bottom:8px}
+.card-body p{margin-bottom:10px; font-size:15.5px}
+.card-body ul{list-style:none; margin-bottom:10px}
+.card-body ul li{position:relative; padding-inline-start:18px; margin-bottom:8px; font-size:15.5px}
+.card-body ul li::before{content:""; position:absolute; inset-inline-start:0; top:.62em; width:7px; height:7px; border-radius:2.5px; background:var(--accent); opacity:.75}
+.card-body ul li b, .card-body p b{font-weight:700}
+/* "What it buys you" box */
+.value{background:linear-gradient(180deg,#fbfaf7,#f7f5ef); border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin-top:16px}
+.value h3{color:var(--teal)}
+.value .row{display:flex; gap:10px; margin-bottom:10px; align-items:flex-start}
+.value .row:last-child{margin-bottom:0}
+.tag{flex:0 0 auto; min-width:64px; text-align:center; font-size:11.5px; font-weight:800; border-radius:8px; padding:3px 8px; margin-top:2px; background:var(--accent-soft); color:var(--accent)}
+.tag.maane{background:var(--teal-soft); color:var(--teal)}
+.tag.podcasto{background:#f3eaff; color:#6d3fd4}
+.tag.interviews{background:#fff0e0; color:#b45e10}
+.tag.caution{background:var(--warn-bg); color:var(--warn-ink)}
+.tag.no{background:#eeece6; color:var(--ink-soft)}
+.value .row p{font-size:15px; margin:0}
+/* inline warning inside card 1 */
+.inline-warn{background:var(--warn-bg); border:1px solid var(--warn-line); border-radius:12px; padding:12px 14px; margin:10px 0; font-size:15px; color:var(--warn-ink)}
+.inline-warn b{font-weight:800}
+/* source link */
+.src{display:inline-flex; align-items:center; gap:7px; margin-top:14px; background:var(--ink); color:#fff !important; text-decoration:none; font-size:14px; font-weight:700; border-radius:12px; padding:11px 18px; transition:opacity .15s}
+.src:active{opacity:.85}
+.src svg{width:14px; height:14px; stroke:#fff; stroke-width:2.4; fill:none; stroke-linecap:round; stroke-linejoin:round}
+.src-note{font-size:12.5px; color:var(--ink-soft); margin-top:8px}
+/* Dropped section */
+.dropped{margin-top:34px}
+.dropped h2.sec-title{font-size:20px; font-weight:800; margin-bottom:4px}
+.dropped .sec-sub{font-size:14px; color:var(--ink-soft); margin-bottom:14px}
+.drop-card{background:var(--drop-bg); border:1px dashed #cfc9bc; border-radius:var(--radius); padding:16px 18px; margin-bottom:12px; opacity:.92}
+.drop-card h3{font-size:16px; font-weight:800; margin-bottom:6px; color:var(--ink)}
+.drop-card p{font-size:14.5px; color:var(--ink-soft); margin-bottom:8px}
+.drop-card a{color:var(--accent); font-size:13px; word-break:break-all; text-decoration:none; border-bottom:1px solid rgba(47,95,224,.35)}
+footer{margin-top:34px; border-top:1px solid var(--line); padding-top:16px; font-size:13px; color:var(--ink-soft)}
+footer p{margin-bottom:6px}
+@media (min-width:640px){
+  .wrap{padding-top:34px}
+  summary{padding:22px 22px 18px}
+  .card-body{padding:0 22px 24px}
+  .s-title{font-size:20px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .chev{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <span class="kicker">רדאר שישי · 11.9.2026</span>
+  <h1>קריאת עומק מסוננת</h1>
+  <p class="subtitle">6 פריטים נכנסו. כל אחד אומת מול המקור לפני הכתיבה. 4 עברו את הסינון, 2 ירדו (בסוף מוסבר למה). המספרים בפריטים 1–3 אומתו מול openai.com ישירות.</p>
+  <div class="stats">
+    <div class="stat total"><b>6</b>נכנסו</div>
+    <div class="stat pass"><b>4</b>עברו סינון</div>
+    <div class="stat drop"><b>2</b>ירדו</div>
+  </div>
+</header>
+
+<div class="banner" role="alert">
+  <h2>⚠️ האזהרה שאסור לפספס · GPT-Live-1</h2>
+  <p><b>עברית לא מופיעה ברשימת הקולות הרשמית.</b> ברשימה כרגע רק אנגלית ופורטוגזית. OpenAI כותבים שהמודל אופטמז ל"שפות הנפוצות" ושבשפות מסוימות יהיה מבטא לא-ילידי או פערים בשטף. לפני שבונים על זה את מענה: בדיקת עברית קטנה קודם.</p>
+  <span class="pill">ניסיון של שעה עולה $3 בלבד — תריץ בדיקה לפני בנייה</span>
+</div>
+
+<div class="controls">
+  <span class="label">4 פריטים שעברו · לחץ לפתיחה</span>
+  <button class="toggle-all" id="toggleAll">פתח הכל</button>
+</div>
+
+<!-- ============ CARD 1 ============ -->
+<details class="card" open id="c1">
+  <summary>
+    <span class="num">1</span>
+    <span>
+      <span class="s-title">GPT-Live-1: מודל קול full-duplex ב-API</span>
+      <div class="s-teaser">הקול שמפעיל את ה-Voice של צ'אטGPT, עכשיו זמין ב-API — $0.05 לדקה. אזהרת עברית בפנים.</div>
+      <div class="badges">
+        <span class="badge">מאומת מול openai.com</span>
+        <span class="badge warn">אין עברית עדיין</span>
+        <span class="badge price">$0.05 / דקה</span>
+      </div>
+    </span>
+    <span class="chev"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+  </summary>
+  <div class="card-body">
+    <section>
+      <h3>מה זה באמת</h3>
+      <p>מודל הקול שמפעיל את ה-Voice של צ'אטGPT, זמין מהיום גם ב-API. full-duplex = הוא מאזין ומדבר באותו זמן, שיחה אחת רציפה בלי "תורות". עד היום ב-API היה GPT-Realtime התורני; הדגם הזה מחליף את הגישה.</p>
+      <ul>
+        <li><b>מחיר:</b> $0.05 לדקת שיחה. זה רק שכבת הקול. החשיבה מאחורה (מודל טקסט שמחובר אליו) מתומחרת בנפרד לפי טוקנים.</li>
+        <li><b>הפרעות ורעש:</b> מודל אחד מעבד גם אודיו נכנס וגם יוצא, בלי שרשרת של STT ← LLM ← TTS. חברת Speak דיווחה על כמעט 80% פחות קטיעות מול מערכות תורניות.</li>
+        <li><b>Delegation:</b> המודל מעביר חשיבה עמוקה וקריאות כלים למודל backend (Astra או מודל אחר), והשיחה ממשיכה בזמן שהעבודה רצה ברקע.</li>
+        <li><b>תמיכה בטלפוניה אמיתית ובשיחות ארוכות.</b></li>
+      </ul>
+    </section>
+    <section>
+      <h3>מה השתנה</h3>
+      <p>30 נקודות שיפור ב-Full Duplex Bench מול GPT-Realtime-2.1, ומקום ראשון ב-Tau3 (מבחן סוכני קול) כשמצמידים לו Astra כ-backend.</p>
+    </section>
+    <div class="inline-warn">
+      <b>אזהרת העברית המלאה:</b> ברשימת הקולות הרשמית בתיעוד יש כרגע רק אנגלית ופורטוגזית. בדף ההשקה OpenAI כותבים שהמודל אופטמז ל"שפות הנפוצות" ושבשפות מסוימות יהיה מבטא לא-ילידי או פערים בשטף. עברית לא צוינה בשום מקום.
+    </div>
+    <div class="value">
+      <h3>מה זה נותן לך</h3>
+      <div class="row"><span class="tag maane">מענה</span><p>זה הלב של המוצר שלך. שיחה רציפה עם הפסקות טבעיות בלי לתפור תשתית בעצמך. אבל קודם — בדיקת עברית (ראה אזהרה למעלה).</p></div>
+      <div class="row"><span class="tag">חשבון</span><p>שעת שיחה = $3 לשכבת הקול + עלות מודל ה-backend. עם backend זול זה נשאר במספרים נמוכים. עם Astra ($50 למיליון טוקנים פלט) זה כבר סיפור אחר.</p></div>
+      <div class="row"><span class="tag no">פודקסטו</span><p>לא רלוונטי. פודקסטו הוא TTS באצווה, לא שיחה חיה.</p></div>
+      <div class="row"><span class="tag interviews">ראיונות</span><p>"בניתי סוכן קולי full-duplex בעברית על ה-API שיצא השבוע" זה משפט פתיחה.</p></div>
+    </div>
+    <a class="src" href="https://openai.com/index/introducing-gpt-live-1-in-the-api/" target="_blank" rel="noopener">מקור: openai.com <svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+    <p class="src-note">אומת גם מול תיעוד ה-API ב-developers.openai.com</p>
+  </div>
+</details>
+
+<!-- ============ CARD 2 ============ -->
+<details class="card" id="c2">
+  <summary>
+    <span class="num">2</span>
+    <span>
+      <span class="s-title">Agents API של OpenAI: התשתית של Codex כשירות</span>
+      <div class="s-teaser">בטא ציבורית: API שמריץ סוכנים בענן על אותו harness שמפעיל את Codex. בלי עמלה נוספת.</div>
+      <div class="badges">
+        <span class="badge">מאומת מול openai.com</span>
+        <span class="badge price">רק טוקנים + כלים</span>
+      </div>
+    </span>
+    <span class="chev"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+  </summary>
+  <div class="card-body">
+    <section>
+      <h3>מה זה באמת</h3>
+      <p>OpenAI פתחה אתמול בטא ציבורית (לכולם) של API שמריץ סוכנים בענן על אותה תשתית (harness) שמפעילה את Codex. קריאת API אחת עם משימה, מודל, כלים וסביבה — והם מנהלים את השאר:</p>
+      <ul>
+        <li><b>הקשר ארוך:</b> compaction אוטומטי כשמתקרבים לגבול חלון ההקשר, בלי שתכתוב את זה בעצמך.</li>
+        <li><b>סוכני-משנה:</b> multi_agent מובנה — הסוכן הראשי מפצל עבודה לסוכנים במקביל ומרכז תוצאות.</li>
+        <li><b>סביבה:</b> sandbox מנוהל אצל OpenAI, תשתית משלך, או שותפים (Cloudflare, Vercel, Modal ועוד).</li>
+        <li><b>כלים:</b> תמיכה מובנית ב-MCP, פונקציות מותאמות, web search, ו-tool search שטוען הגדרות כלים לפי צורך כדי לחסוך טוקנים.</li>
+      </ul>
+    </section>
+    <section>
+      <h3>מה השתנה</h3>
+      <p>עד היום בנית את התשתית הזו לבד (או לקחת פריימוורק). עכשיו OpenAI מוכרת אותה. אין עמלה נוספת: משלמים רק טוקנים וכלים.</p>
+    </section>
+    <div class="value">
+      <h3>מה זה נותן לך</h3>
+      <div class="row"><span class="tag podcasto">פודקסטו</span><p>ה-API תומך ב-MCP מובנה (server_url + transport http, בדיוק הצורה שהגדרת בשרת שלך). סוכן על Agents API יכול לקרוא ל-generate_episode בלי שכבת תיווך. ויותר מזה: זו ולידציה שהימור ה-MCP שלך היה נכון — OpenAI בונה את התשתית המרכזית שלה סביב פרוטוקול שכבר מימשת לבד.</p></div>
+      <div class="row"><span class="tag maane">מענה</span><p>ארכיטקטורת "מתאם ראשי + סוכני-משנה", שאתה מריץ בעצמך עם שני הסוכנים, קיבלה מימוש רשמי. אם תרצה להעביר אוטומציות לתשתית מנוהלת, זו הדרך.</p></div>
+      <div class="row"><span class="tag interviews">ראיונות</span><p>ישאלו איך בונים סוכן שרץ בפרודקשן. עכשיו יש לך שתי תשובות: "בניתי לבד" (מענה, פודקסטו) ו"אני מכיר את ה-harness המנוהל של OpenAI". נתון לזכור: SafetyKit דיווחו 60% ירידה בעלות ל-case אחרי מעבר ל-Agents API.</p></div>
+      <div class="row"><span class="tag caution">זהירות</span><p>בטא, והם אומרים שישנו מהר לפני GA. לא לבנות עליו משהו שלקוחות תלויים בו בלי fallback.</p></div>
+    </div>
+    <a class="src" href="https://openai.com/index/introducing-the-agents-api/" target="_blank" rel="noopener">מקור: openai.com <svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+  </div>
+</details>
+
+<!-- ============ CARD 3 ============ -->
+<details class="card" id="c3">
+  <summary>
+    <span class="num">3</span>
+    <span>
+      <span class="s-title">GPT-6 Astra: המודל שיושב עכשיו ב-Codex שלך</span>
+      <div class="s-teaser">ממוקד קוד ו-computer-use. הלוסינציות ירדו מ-12.2% ל-4.2% — המספר החשוב לך כאן.</div>
+      <div class="badges">
+        <span class="badge">מאומת מול openai.com + InfoQ</span>
+        <span class="badge price">$10 קלט / $50 פלט למיליון</span>
+      </div>
+    </span>
+    <span class="chev"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+  </summary>
+  <div class="card-body">
+    <section>
+      <h3>מה זה באמת</h3>
+      <p>המודל החדש של OpenAI, ממוקד קוד ו-computer-use (הפעלת תוכנה דרך ממשק גרפי). יצא אתמול. ב-API הוא <b>gpt-6-astra</b>, ומתגלגל ל-ChatGPT Plus/Pro/Business/Enterprise.</p>
+      <ul>
+        <li><b>מספרים (של OpenAI, במבחנים שלה):</b> 57.9% ב-Terminal-Bench 4.0, 74.1% ב-DeepSWE, 72.6% ב-OSWorld 2.0 מול 65.7% ל-GPT-5.6 Sol.</li>
+        <li><b>הלוסינציות: 4.2% מול 12.2% אצל הקודם.</b> בשבילך זה המספר החשוב ביותר בפריט, כי אתה מוודא כל פלט.</li>
+        <li><b>מחיר API:</b> $10 למיליון טוקנים קלט, $50 פלט. יקר. מודל לכלי עבודה, לא ל-backend של מוצר.</li>
+        <li><b>הנקודה הכי רלוונטית לך:</b> מנגנון ניסיוני ב-Codex שנותן לסוכן לשמור פתקים בין חלונות הקשר במקום להסתמך רק על compaction. חלונות קודמים נשארים searchable — בעבודת יום ארוכה על ריפו, דרישות ותוצאות טסטים מהבוקר לא הולכות לאיבוד אחרי הצהריים.</li>
+      </ul>
+    </section>
+    <section>
+      <h3>מה השתנה</h3>
+      <p>קפיצה ב-computer-use ובסייבר (המודל הראשון שלהם שמסווג "קריטי" במסגרת הבטיחות, פחות רלוונטי לך). אזהרה אחת מהמקור עצמו: OpenAI מודה שה-reasoning הכתוב של Astra קשה יותר לניטור מקודמו — קשה יותר לבדוק "למה הוא עשה מה שעשה", וזה נוגע ישירות בסגנון ה-fact-checking שלך.</p>
+    </section>
+    <div class="value">
+      <h3>מה זה נותן לך</h3>
+      <div class="row"><span class="tag">Codex</span><p>בעבודה היומיומית: שדרוג ישיר, בעיקר הפתקים בין-הקשריים.</p></div>
+      <div class="row"><span class="tag interviews">ראיונות</span><p>שים לב שכל שלושת הפריטים ברדאר הזה הם מערכת אחת: GPT-Live-1 הוא הקול, Agents API הוא ה-harness, Astra הוא המוח. מי שמספר את זה כסיפור אחד בראיון נשמע כמו מי שבונה מערכות, לא כמו מי שקורא חדשות.</p></div>
+      <div class="row"><span class="tag no">לא ל-backend</span><p>לא ל-backend של מענה או פודקסטו: $50 למיליון פלט זה ההיפך מ"כל שקל נספר".</p></div>
+    </div>
+    <a class="src" href="https://openai.com/index/gpt-6-astra/" target="_blank" rel="noopener">מקור: openai.com <svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+    <p class="src-note">אומת מול infoq.com/news/2026/09/openai-gpt6-astra/</p>
+  </div>
+</details>
+
+<!-- ============ CARD 4 ============ -->
+<details class="card" id="c4">
+  <summary>
+    <span class="num">4</span>
+    <span>
+      <span class="s-title">DeepSeek V4.1-Flash: משקלים פתוחים, מחיר ריצפה</span>
+      <div class="s-teaser">552 מיליארד פרמטרים, 8–16 מיליארד פעילים לטוקן, רישיון MIT. 80+ פעם פחות מ-Astra בפלט.</div>
+      <div class="badges">
+        <span class="badge unverified">מספרים לא אומתו עצמאית</span>
+        <span class="badge price">$0.60 / מיליון פלט בשפל</span>
+      </div>
+    </span>
+    <span class="chev"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+  </summary>
+  <div class="card-body">
+    <section>
+      <h3>מה זה באמת</h3>
+      <ul>
+        <li>מודל חדש של DeepSeek, משקלים פתוחים ברישיון MIT ב-Hugging Face. 552 מיליארד פרמטרים, אבל רק 8–16 מיליארד פעילים לכל טוקן. הארכיטקטורה עושה קריאת קלט זולה, בנויה במפורש לסוכנים שקוראים הרבה.</li>
+        <li><b>מחיר:</b> $0.60 למיליון טוקנים פלט בשעות שפל, קלט מהקאש $0.003. שעות שיא (בוקר UTC) כפול. זה יותר מ-80 פעם פחות מ-Astra בפלט.</li>
+        <li><b>בנצ'מרקים (של DeepSeek, לא אומתו עצמאית):</b> 74.2 ב-DeepSWE, שווה ל-Claude Opus 5. חלש בהיגיון קשה: 36.8 מול 56.3 ב-Humanity's Last Exam.</li>
+        <li><b>מלכוד לזכור:</b> מ-14.9 כל קריאה ל-V4-Pro (דגם הדגל שלהם) תנותב אוטומטית ל-Flash. מודל שהסתמכת עליו יכול להתחלף מתחתיך בין לילה.</li>
+      </ul>
+    </section>
+    <div class="value">
+      <h3>מה זה נותן לך</h3>
+      <div class="row"><span class="tag podcasto">פודקסטו</span><p>מועמד לבדיקה ל-backend הזול (כתיבת תסריטים), שם זו קריאת טקסט באצווה ולא צריך היגיון גבוה. לבדוק איכות עברית לפני שמחברים.</p></div>
+    </div>
+    <a class="src" href="https://thenextweb.com/news/deepseek-v4-1-flash-launch-v4-pro-retired-price-cut" target="_blank" rel="noopener">מקור: The Next Web <svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+    <p class="src-note">TNW מציינים בעצמם שהמספרים לא אומתו</p>
+  </div>
+</details>
+
+<!-- ============ DROPPED ============ -->
+<section class="dropped">
+  <h2 class="sec-title">מה ירד בסינון, ולמה</h2>
+  <p class="sec-sub">פריטים שהגיעו לרדאר אבל לא עברו את רף "שווה את הזמן שלך".</p>
+
+  <div class="drop-card">
+    <h3>Cursor Projects</h3>
+    <p>מוצר יפה. סוכן מתאם שמנהל אלפי סוכני-משנה, רץ בענן, עוקב אחרי Slack ו-PRs. אבל אתה עובד ב-Claude Code וב-Codex, לא ב-Cursor, ואת הרעיון של "מתאם + סוכני-משנה + מעקב אירועים" אתה כבר מריץ עם שני הסוכנים שלך. <b>אין פעולה.</b></p>
+    <a href="https://cursor.com/blog/projects" target="_blank" rel="noopener">cursor.com/blog/projects</a>
+  </div>
+
+  <div class="drop-card">
+    <h3>Cognition SWE-2</h3>
+    <p>"קוד ברמת החזית ב-64% פחות". אבל המשקלים סגורים, אין API, זמין רק בתוך Devin שאתה לא משתמש בו. ושים לב למקור: זה בלוג של OrcaRouter, חברה שמוכרת גישה למודל הבסיס (Kimi K3) — יש להם אינטרס שתאמין שהבסיס שווה. המספרים של Cognition, לא אומתו.</p>
+    <a href="https://www.orcarouter.ai/blog/cognition-swe-2-release" target="_blank" rel="noopener">orcarouter.ai/blog/cognition-swe-2-release</a>
+  </div>
+</section>
+
+<footer>
+  <p>הפריטים הגיעו מהסוכן השני ואומתו מול המקורות לפני הכתיבה. פריטים 1–3 אומתו מול openai.com ישירות. בפריט 4 המקור הוא TNW והמספרים מסומנים כ"לא אומתו" גם על ידם.</p>
+  <p>רדאר שישי · 11 בספטמבר 2026 · קריאת עומק מסוננת</p>
+</footer>
+
+</div>
+<script>
+(function(){
+  var btn = document.getElementById('toggleAll');
+  var cards = Array.prototype.slice.call(document.querySelectorAll('details.card'));
+  function sync(){
+    var allOpen = cards.every(function(c){return c.open;});
+    btn.textContent = allOpen ? 'סגור הכל' : 'פתח הכל';
+  }
+  btn.addEventListener('click', function(){
+    var allOpen = cards.every(function(c){return c.open;});
+    cards.forEach(function(c){ c.open = !allOpen; });
+    sync();
+  });
+  cards.forEach(function(c){ c.addEventListener('toggle', sync); });
+  sync();
+})();
+</script>
+</body>
+</html>
